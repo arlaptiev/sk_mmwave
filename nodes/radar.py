@@ -12,7 +12,7 @@ from xwr_raw.radar_lua_config import LuaRadarConfig
 from xwr_raw.dca_data_pub import DCADataPub
 
 
-def init_radar_node(args, publisher=None, verbose=False):
+def init_radar_node(args, callback=None, verbose=False):
     """Initializes radar capture and starts publishing frames.
 
     Args:
@@ -20,7 +20,7 @@ def init_radar_node(args, publisher=None, verbose=False):
             `lua`           - Path to LUA configuration file for radar
             `host_ip`       - IP address of host
             `host_port`     - Data port of host
-        publisher (callable, optional): Function to handle published radar data.
+        callback (callable, optional): Function to handle published radar data.
         verbose (bool): If True, prints status messages.
     """
     lua_path = os.path.abspath(args.lua)
@@ -54,8 +54,8 @@ def init_radar_node(args, publisher=None, verbose=False):
                 if verbose:
                     print(f"[DEBUG] New frame received. Length: {len(frame_data)}")
 
-                if publisher:
-                    publisher(radar_msg)
+                if callback:
+                    callback(radar_msg)
 
             time.sleep(0.01)  # Prevents busy-looping
     except KeyboardInterrupt:
@@ -72,5 +72,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Use a simple print function as default publisher for CLI runs
-    init_radar_node(args, publisher=print, verbose=args.verbose)
+    init_radar_node(args, callback=print, verbose=args.verbose)
 
