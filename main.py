@@ -2,6 +2,8 @@ import os
 import sys
 import argparse
 
+import threading
+
 # Add the project root and sibling directories to PYTHONPATH
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
@@ -22,11 +24,15 @@ def main():
 
     args = parser.parse_args()
 
-    # Start the radar node
+    # make radar thread
     print(f"[INFO] Starting radar node with config: {args.lua}")
-    init_radar_node(args, callback=print, verbose=args.verbose)
+    radar_thread = threading.Thread(init_radar_node(args, callback=print, verbose=args.verbose)) 
 
-    # Start the phone node
+    # make phone thread
+
+
+    # start all threads
+    radar_thread.start()
 
 
 
