@@ -61,7 +61,7 @@ def init_radar_node(args, callback=None, verbose=False):
                 if callback:
                     callback(radar_msg)
 
-            time.sleep(0.01)  # Prevents busy-looping
+            # time.sleep(0.01)  # Prevents busy-looping
     except KeyboardInterrupt:
         if verbose:
             print("[INFO] Stopping radar capture.")
