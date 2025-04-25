@@ -1,5 +1,5 @@
 -- If true, set all settings. Else, skip    #false
-set_data = false
+set_data = true
 -- Hard code settings for now
 partId = 1443
 RX_GAIN = 30

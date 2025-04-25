@@ -8,7 +8,7 @@ import threading
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from nodes.radar import init_radar_node
-
+from nodes.phone import listen_to_phone
 
 
 
@@ -29,10 +29,11 @@ def main():
     radar_thread = threading.Thread(init_radar_node(args, callback=print, verbose=args.verbose)) 
 
     # make phone thread
-
+    phone_thread = threading.Thread(listen_to_phone())
 
     # start all threads
     radar_thread.start()
+    phone_thread.start()
 
 
 
