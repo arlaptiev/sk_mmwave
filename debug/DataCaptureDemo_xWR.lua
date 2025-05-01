@@ -163,7 +163,7 @@ if (ar1.SetTestSource(4, 3, 0, 0, 0, 0, -327, 0, -327, 327, 327, 327, -2.5, 327,
                       327, 327, 327, -95, 0, 0, 0.5, 0, 1, 0, 1.5, 0, 0, 0, 0, 0, 0, 0) == 0) then
     WriteToLog("Test Source Configuration Success\n", "green")
 else
-    WriteToLog("Test Source Configuration failure\n", "red")
+    WriteToLog("Test Source Configurati_on failure\n", "red")
 end
 
 if((partId == 1642) or (partId == 1843)) then
