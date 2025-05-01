@@ -159,12 +159,12 @@ elseif ((partId == 1243) or (partId == 1443)) then
     end
 end
 
-if (ar1.SetTestSource(4, 3, 0, 0, 0, 0, -327, 0, -327, 327, 327, 327, -2.5, 327, 327, 0, 0, 0, 0, -327, 0, -327, 
-                      327, 327, 327, -95, 0, 0, 0.5, 0, 1, 0, 1.5, 0, 0, 0, 0, 0, 0, 0) == 0) then
-    WriteToLog("Test Source Configuration Success\n", "green")
-else
-    WriteToLog("Test Source Configuration failure\n", "red")
-end
+-- if (ar1.SetTestSource(4, 3, 0, 0, 0, 0, -327, 0, -327, 327, 327, 327, -2.5, 327, 327, 0, 0, 0, 0, -327, 0, -327, 
+--                       327, 327, 327, -95, 0, 0, 0.5, 0, 1, 0, 1.5, 0, 0, 0, 0, 0, 0, 0) == 0) then
+--     WriteToLog("Test Source Configuration Success\n", "green")
+-- else
+--     WriteToLog("Test Source Configuration failure\n", "red")
+-- end
 
 if((partId == 1642) or (partId == 1843)) then
     if(ar1.ProfileConfig(0, 77, 100, 6, 60, 0, 0, 0, 0, 0, 0, 29.982, 0, 256, 5000, 0, 0, 30) == 0) then
