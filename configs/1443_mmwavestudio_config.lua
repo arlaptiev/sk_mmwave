@@ -24,7 +24,7 @@ RAMP_END_TIME = 60 -- us
 ADC_START_TIME = 6 --us
 FREQ_SLOPE = 29.982 -- MHz/us
 ADC_SAMPLES = 256
-SAMPLE_RATE = 10000 -- ksps
+SAMPLE_RATE = 10000 -- ks/sec
 RX_GAIN = 30 -- dB
 
 -- ChirpConfig
