@@ -12,7 +12,7 @@ file_path = string.gsub(file_path, "@","");
 file_path = string.gsub(file_path, "DataCaptureDemo_xWR_No_Restart.lua","");
 -- fw_path   = file_path.."..\\..\\rf_eval_firmware"
 
-
+print("Begin\n", "green")
 
 
 --Export bit operation file
@@ -63,9 +63,9 @@ file_path = string.gsub(file_path, "DataCaptureDemo_xWR_No_Restart.lua","");
 -- ESVersion = bit_and(ESVersion, 15)
 
 -- --ADC_Data file path
-n_file_path = "C:\\ti\\mmwave_studio_02_01_01_00\\mmWaveStudio"
-data_path     = file_path.."\\PostProc\\Data"
-adc_data_path = data_path.."\\adc_data"..os.time()..".bin"
+-- n_file_path = "C:\\ti\\mmwave_studio_02_01_01_00\\mmWaveStudio"
+-- data_path     = file_path.."\\PostProc\\Data"
+-- adc_data_path = data_path.."\\adc_data"..os.time()..".bin"
 
 -- -- Download Firmware
 -- if(partId == 1642) then
