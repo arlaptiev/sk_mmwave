@@ -12,4 +12,3 @@ def listen_to_phone():
     while True:
         data, addr = sock.recvfrom(1024)
         print(f"Received message from {addr}: {data.decode()}")
-

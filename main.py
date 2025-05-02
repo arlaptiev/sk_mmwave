@@ -29,11 +29,11 @@ def main():
     radar_thread = threading.Thread(init_radar_node(args, callback=print, verbose=args.verbose)) 
 
     # make phone thread
-    phone_thread = threading.Thread(listen_to_phone())
+    #phone_thread = threading.Thread(listen_to_phone())
 
     # start all threads
     radar_thread.start()
-    phone_thread.start()
+    #phone_thread.start()
 
 
 
