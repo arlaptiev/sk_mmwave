@@ -2,7 +2,7 @@
 -- 3 Tx 4 Rx | complex 1x
 
 
-COM_PORT = 15 -- 12 for 1843 on Edwin laptop (Application Port)
+COM_PORT = 15 -- (UART Application Port)
 RADARSS_PATH = "C:\\ti\\mmwave_studio_02_01_01_00\\rf_eval_firmware\\radarss\\xwr12xx_xwr14xx_radarss.bin"
 MASTERSS_PATH = "C:\\ti\\mmwave_studio_02_01_01_00\\rf_eval_firmware\\masterss\\xwr12xx_xwr14xx_masterss.bin"
 -- RADARSS_PATH = "C:\\ti\\mmwave_studio_02_01_01_00\\rf_eval_firmware\\radarss\\xwr12xx_xwr14xx_radarss_ES2.0.bin"
