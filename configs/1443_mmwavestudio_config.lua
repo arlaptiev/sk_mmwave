@@ -64,7 +64,7 @@ ar1.GetBSSFwVersion()
 --------
 
 -------- STATIC CONFIG STUFF --------
-ar1.ChanNAdcConfig(1, 1, 1, 1, 1, 1, 1, 2, 1, 0)
+ar1.ChanNAdcConfig(1, 0, 0, 1, 1, 1, 1, 2, 1, 0)
 ar1.LPModConfig(0, 0)
 ar1.RfInit()
 --------------------------------------
