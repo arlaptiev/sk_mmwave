@@ -36,7 +36,7 @@ RX_GAIN = 30 -- dB
 START_CHIRP_TX = 0
 END_CHIRP_TX = 0 -- 2 for 1843
 NUM_FRAMES = 100 -- Set this to 0 to continuously stream data
-CHIRP_LOOPS = 32 --    //32
+CHIRP_LOOPS = 128 --    //32
 PERIODICITY = 100 -- ms  //30
 -----------------------------------------------------------
 
@@ -48,11 +48,9 @@ ar1.Connect(COM_PORT,921600,1000)
 
 -------- https://cdn.vox-cdn.com/thumbor/2q97YCXcLOlkoR2jKKEMQ-wkG9k=/0x0:900x500/1200x800/filters:focal(378x178:522x322)/cdn.vox-cdn.com/uploads/chorus_image/image/49493993/this-is-fine.0.jpg --------
 ar1.Calling_IsConnected()
-ar1.SelectChipVersion("AR1642")
 ar1.frequencyBandSelection("77G")
-ar1.SelectChipVersion("XWR1843")
-ar1.SelectChipVersion("AR1642")
-ar1.SelectChipVersion("XWR1843")
+ar1.SelectChipVersion("AR1243")
+ar1.SelectChipVersion("XWR1443")
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -------- DOWNLOAD FIRMARE --------
@@ -60,13 +58,13 @@ ar1.DownloadBSSFw(RADARSS_PATH)
 ar1.GetBSSFwVersion()
 ar1.GetBSSPatchFwVersion()
 ar1.DownloadMSSFw(MASTERSS_PATH)
-ar1.PowerOn(1, 1000, 0, 0)
+ar1.PowerOn(0, 1000, 0, 0)
 ar1.RfEnable()
 ar1.GetBSSFwVersion()
 --------
 
 -------- STATIC CONFIG STUFF --------
-ar1.ChanNAdcConfig(1, 1, 0, 1, 1, 1, 1, 2, 1, 0)
+ar1.ChanNAdcConfig(1, 1, 1, 1, 1, 1, 1, 2, 1, 0)
 ar1.LPModConfig(0, 0)
 ar1.RfInit()
 --------------------------------------
@@ -74,7 +72,7 @@ ar1.RfInit()
 -------- DATA CONFIG STUFF --------
 ar1.DataPathConfig(1, 1, 0)
 ar1.LvdsClkConfig(1, 1)
-ar1.LVDSLaneConfig(0, 1, 1, 1, 1, 1, 0, 0)
+ar1.LVDSLaneConfig(0, 1, 1, 0, 0, 1, 0, 0) ---ar1.LVDSLaneConfig(0, 1, 1, 1, 1, 1, 0, 0)
 -----------------------------------
 
 -------- SENSOR CONFIG STUFF --------
@@ -87,7 +85,7 @@ ar1.FrameConfig(START_CHIRP_TX, END_CHIRP_TX, NUM_FRAMES, CHIRP_LOOPS, PERIODICI
 ar1.SelectCaptureDevice("DCA1000")
 ar1.CaptureCardConfig_EthInit("192.168.33.30", "192.168.33.180", "12:34:56:78:90:12", 4096, 4098)
 ar1.CaptureCardConfig_Mode(1, 1, 1, 2, 3, 30)
-ar1.CaptureCardConfig_PacketDelay(100)
+ar1.CaptureCardConfig_PacketDelay(25)
 --------------------------------
 
 -------- https://www.google.com/search?q=everything+is+fine+meme+spongebob&rlz=1C1CHBF_enUS794US794&source=lnms&tbm=isch&sa=X&ved=0ahUKEwiBk7vfw9DjAhWVG80KHTdsDnoQ_AUIESgB&biw=1536&bih=722#imgrc=7BHtSeLSvvNceM: --------
