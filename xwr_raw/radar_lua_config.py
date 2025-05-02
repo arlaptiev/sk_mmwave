@@ -85,7 +85,7 @@ class LuaRadarConfig(OrderedDict):
         params['platform'] =  funcs.get("ar1.SelectChipVersion", [[None]])[-1][0] if 'ar1.SelectChipVersion' in funcs else None
 
         lua2cfg_platform = {                                        # map .lua platform to .cfg platform
-            'XWR1843': 'xWR18xx',
+            'XWR1443': 'xWR18xx',
             None: None,
         }
         params['platform'] = lua2cfg_platform[params['platform']]
