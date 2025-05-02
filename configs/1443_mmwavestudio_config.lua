@@ -14,7 +14,7 @@ PKT_LOG_PATH  = "C:\\mmwave-phone\\raw-data\\pktlogfile.txt"
 
 -------- VERY IMPORTANT AND SERIOUS RADAR SETTINGS --------
 -- General
-NUM_TX = 3
+NUM_TX = 1
 NUM_RX = 4
 
 -- ProfileConfig
@@ -77,7 +77,7 @@ ar1.LVDSLaneConfig(0, 1, 1, 0, 0, 1, 0, 0) ---ar1.LVDSLaneConfig(0, 1, 1, 1, 1, 
 
 -------- SENSOR CONFIG STUFF --------
 ar1.ProfileConfig(0, START_FREQ, IDLE_TIME, ADC_START_TIME, RAMP_END_TIME, 0, 0, 0, 0, 0, 0, FREQ_SLOPE, 0, ADC_SAMPLES, SAMPLE_RATE, 0, 0, RX_GAIN)
-ar1.ChirpConfig(0, 0, 0, 0, 0, 0, 0, 1, 1, 0)
+ar1.ChirpConfig(0, 0, 0, 0, 0, 0, 0, 1, 0, 0)
 ar1.FrameConfig(START_CHIRP_TX, END_CHIRP_TX, NUM_FRAMES, CHIRP_LOOPS, PERIODICITY, 0, 0, 1)
 -------------------------------------
 
