@@ -22,8 +22,9 @@ START_FREQ = 77 -- GHz
 IDLE_TIME = 100 -- us
 RAMP_END_TIME = 60 -- us
 ADC_START_TIME = 6 --us
-FREQ_SLOPE = 29.982 -- MHz/us
-ADC_SAMPLES = 256
+-- FREQ_SLOPE = 29.982 -- MHz/us
+FREQ_SLOPE = 60.012 -- MHz/us
+ADC_SAMPLES = 512
 SAMPLE_RATE = 10000 -- ks/sec
 RX_GAIN = 30 -- dB
 
@@ -35,9 +36,9 @@ RX_GAIN = 30 -- dB
 -- FrameConfig
 START_CHIRP_TX = 0
 END_CHIRP_TX = 0 -- 2 for 1843
-NUM_FRAMES = 100 -- Set this to 0 to continuously stream data
-CHIRP_LOOPS = 128 --    //32
-PERIODICITY = 100 -- ms  //30
+NUM_FRAMES = 1000 -- Set this to 0 to continuously stream data
+CHIRP_LOOPS = 1 --    //32
+PERIODICITY = 3 -- ms  //30
 -----------------------------------------------------------
 
 -------- THIS IS FINE --------
@@ -72,7 +73,7 @@ ar1.RfInit()
 -------- DATA CONFIG STUFF --------
 ar1.DataPathConfig(1, 1, 0)
 ar1.LvdsClkConfig(1, 1)
-ar1.LVDSLaneConfig(0, 1, 1, 0, 0, 1, 0, 0) ---ar1.LVDSLaneConfig(0, 1, 1, 1, 1, 1, 0, 0)
+ar1.LVDSLaneConfig(0, 1, 1, 1, 1, 1, 0, 0)
 -----------------------------------
 
 -------- SENSOR CONFIG STUFF --------
