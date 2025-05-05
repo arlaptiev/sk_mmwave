@@ -1,3 +1,31 @@
+CONFIG V1:
+# config V1
+
+c = 3e8                         # speed of light in m/s
+
+# frame config
+NUM_FRAMES = 1000
+NUM_CHIRP = 1                   # chirp loop count
+PERIODICITY = 3                 # periodicity in ms
+
+# profile config
+FREQUENCY = 77                  # start frequency
+SAMPLES_PER_CHIRP = 512         # ADC number of samples
+SAMPLE_RATE_KHZ = 10000         # digout sample rate in kHz
+RAMP_END_TIME_US = 60           # us
+ADC_START_TIME_US = 6           # us
+FREQ_SLOPE_MHZ = 60.012         # frequency slope in MHz (/us)
+
+# chan & adc config
+NUMRX = 4
+
+SAMPLE_RATE = SAMPLE_RATE_KHZ * 1e3             # digout sample rate in Hz
+SWEEP_TIME = SAMPLES_PER_CHIRP / SAMPLE_RATE
+FREQ_SLOPE = FREQ_SLOPE_MHZ * 1e12              # frequency slope in Hz (/s)
+
+BANDWIDTH = FREQ_SLOPE * SWEEP_TIME             # bandwidth in Hz
+RESOLUTION = c / (2 * BANDWIDTH)                # range resolution in m
+
 
 
 TRIAL 1
