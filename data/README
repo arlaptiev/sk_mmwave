@@ -28,7 +28,8 @@ RESOLUTION = c / (2 * BANDWIDTH)                # range resolution in m
 
 
 
-TRIAL 1
+SETUP 1
+box on top of box
 
 Floor-to-radar: 1.5m
 Floor-to-topbox: 1.23m
@@ -37,3 +38,10 @@ Floor-to-table: 0.64m
 
 Radar-to-top obj: 0.7m
 Radar-to-table: 0.86m
+
+
+SETUP 2
+box on top of table
+
+Table-to-radar: 0.68m
+Table-to-topbox: 0.16m
