@@ -14,6 +14,8 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from nodes.radar import Radar
 
+# style
+plt.style.use('dark_background')
 
 
 
@@ -34,6 +36,8 @@ SAMPLE_RATE = SAMPLE_RATE_KHZ * 1e3             # digout sample rate in Hz
 FREQ_SLOPE_MHZ = 60.012         # frequency slope in MHz (/us)
 FREQ_SLOPE = FREQ_SLOPE_MHZ * 1e12              # frequency slope in Hz (/s)
 
+
+# DISPLAY_RATE
 
 
 def display_frame(message):
@@ -65,6 +69,7 @@ def display_frame(message):
     ax_freq.set_xlabel('Distance (m)')
     ax_freq.set_ylabel('Magnitude')
 
+    plt.xlim(0,2)
     plt.pause(0.001)
 
 
