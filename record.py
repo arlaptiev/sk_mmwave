@@ -64,18 +64,16 @@ def main():
     parser = argparse.ArgumentParser(description="Start the mmWave Radar Node.")
 
     # radar args
-    parser.add_argument("--lua",            default='configs/1443_mmwavestudio_config.lua', type=str, help="Path to the Lua config file")
+    parser.add_argument("--cfg",            default='configs/1443_mmwavestudio_config_continuous.lua', type=str, help="Path to the Lua config file")
     parser.add_argument('--host_ip',        default='192.168.33.30', help='IP address of host.')
     parser.add_argument('--host_data_port', default=4098, type=int, help='Data port of host.')
-    parser.add_argument("--verbose",        default=False, help="Enable verbose logging")
     # phone args
 
     args = parser.parse_args()
 
     # Start the radar node
-    print(f"[INFO] Starting radar node with config: {args.lua}")
     setup_logging_file("radar", ['node', 'data', 'timestamp'])
-    init_radar_node(args, callback=record, verbose=args.verbose)
+    Radar(args, callback=record)
 
     # Start the phone node
 

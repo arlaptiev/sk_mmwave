@@ -1,203 +1,172 @@
 #!/usr/bin/env python3
 
-"""Wrapper for .cfg file used to configure radar EVM.
+"""Wrapper for .lua file used to configure the radar
 
-Also computes derived parameters from the config using get_params().
+Also computations derived parameters from the config using get_params().
+
+Modified from: https://github.com/ConnectedSystemsLab/xwr_raw_ros/blob/main/src/xwr_raw/radar_config.py
 """
 
 from collections import OrderedDict
 import pprint
+import re
+
 
 class RadarConfig(OrderedDict):
-    """Container for EVM config that gets sent through UART.
 
-    Attributes:
-        cmds: List of valid commands (developed for SDK 3.5.0.4)
-        multi_cmds: List of commands that can appear more than once per config file.
-    """
-
-    headers = [
-        'Created for SDK',
-        'Platform',
-    ]
-
-    cmds = [
-        'dfeDataOutputMode',
-        'channelCfg',
-        'adcCfg',
-        'adcbufCfg',
-        # 'profileCfg',
-        # 'chirpCfg',
-        'lowPower',
-        'frameCfg',
-        'guiMonitor',
-        # 'cfarCfg',
-        'multiObjBeamForming',
-        'calibDcRangeSig',
-        'clutterRemoval',
-        'aoaFovCfg',
-        # 'cfarFovCfg',
-        'compRangeBiasAndRxChanPhase',
-        'measureRangeBiasAndRxChanPhase',
-        'extendedMaxVelocity',
-        'bpmCfg',
-        # 'CQRxSatMonitor',
-        # 'CQSigImgMonitor',
-        'analogMonitor',
-        'lvdsStreamCfg',
-        'calibData',
-    ]
-
-    multi_cmds = [
-        'profileCfg',
-        'chirpCfg',
-        'cfarCfg',
-        'cfarFovCfg',
-        'CQRxSatMonitor',
-        'CQSigImgMonitor',
-    ]
+    platforms = {
+        "XWR1443": "xWR14xx",
+    }
 
     def __init__(self):
         super(RadarConfig, self).__init__()
 
-    def __init__(self, cfg):
-        """Initialize RadarConfig from a list of config commands or a dict of config commands.
+    def __init__(self, cfg: str):
+        """Initialize RadarConfig from a .lua file used in mmWaveStudio to configure the radar
 
         Args:
-            cfg: List of strings, where each string is a config command. Alternatively, a dict mapping config commands to parameters.
+            cfg: Path to the .lua file
         """
         super(RadarConfig, self).__init__()
-        if isinstance(cfg, list):
-            self.from_cfg(cfg)
-        elif isinstance(cfg, dict):
-            for k,v in cfg.items():
-                self[k] = v
 
-    def from_cfg(self, cfg):
-        """Add commands to RadarConfig from a list of config commands.
+        self.from_cfg(cfg)
 
-        Args:
-            cfg: List of strings, where each string is a config command.
+    def from_cfg(self, cfg: str):
+        """
+        Parses the .lua file and populates the RadarConfig object with the parameters
         """
 
-        for line in cfg:
-            for hdr in RadarConfig.headers:
-                if hdr in line:
-                    params = line.split(':')[1].strip()
-                    self[hdr] = params
-                    break
+        with open(cfg, "r") as f:
+            for line in f:
+                # See if it's a variable assignment
+                match = re.match(r"(\w+)\s*=\s*([^\n]*?)(?=\s*--|$)", line)
+                if match:
+                    key, value = match.groups()
+                    self[key] = self._extract_value(value)
+                    continue
 
-            for cmd in RadarConfig.cmds:
-                if cmd in line:
-                    params = [float(x) if '.' in x else int(x)
-                              for x in line.split()[1:]]
+                # See if it's a function call
+                match = re.match(r"([\w\.]+)\((.+?)\)", line)
 
-                    self[cmd] = params
-                    break
+                if match:
+                    f, args = match.groups()
+                    args = args.strip()
 
-            for cmd in RadarConfig.multi_cmds:
-                if cmd in line:
-                    params = [float(x) if '.' in x else int(x)
-                              for x in line.split()[1:]]
+                    self[f] = args.split(",")
 
-                    if cmd not in self.keys():
-                        self[cmd] = [params]
-                    else:
-                        self[cmd].append(params)
-                    break
+                    continue
 
-
-    def to_cfg(self):
-        """Convert RadarConfig into a list of config commands.
-
-        Args:
-            cfg: List of strings, where each string is a config command.
+    def _extract_value(self, value):
         """
-        cfg = []
-
-        for cmd, params in self.items():
-            if isinstance(params[0], list):
-                # Multi cmd case.
-                for param in params:
-                    cfg.append(' '.join([cmd] + [f'{x:.2f}' if type(x) is float else f'{x:}'
-                                                 for x in param]))
-            else:
-                cfg.append(' '.join([cmd] + [f'{x:.2f}' if type(x) is float else f'{x:}'
-                                             for x in params]))
-
-        return cfg
+        Extracts the value from a string, removing any quotes or extra characters
+        """
+        if isinstance(value, str):
+            value = value.strip().strip('"').strip("'")
+            try:
+                if "." in value:
+                    value = float(value)
+                else:
+                    value = int(value)
+            except ValueError:
+                pass
+        return value
 
     def get_params(self):
-        """Returns number of samples, rx, tx, chirps, frame size, frame time, etc."""
+        """
+        Computes derived parameters from the config
 
-        sdk = self['Created for SDK']
-        platform = self['Platform']
+        Equations copied from the .lua file
+        """
 
-        adc_output_fmt = int(self['adcCfg'][1]) # 0 - real, 1 - complex 1x, 2- complex 2x
+        arg_platform = self["ar1.SelectChipVersion"][0].strip('"').strip("'")
 
-        n_samples = int(self['profileCfg'][0][9])
+        platform = self.platforms.get(arg_platform, "Unknown")
 
-        rx_str = self['channelCfg'][0]
-        rx_bin = bin(int(rx_str))[2:]
-        rx = [int(x) for x in reversed(rx_bin)]
+        # TODO: Only portions of this value actually matter see LUA_API.md
+        adc_output_fmt = int(
+            self["ar1.ChanNAdcConfig"][8]
+        )  # 0 - real, 1 - complex 1x, 2- complex 2x
 
-        tx_str = self['channelCfg'][1]
-        tx_bin = bin(int(tx_str))[2:]
-        tx = [int(x) for x in reversed(tx_bin)]
+        # Calculate number of chirps
+        start_chirp = int(self["START_CHIRP_TX"])
+        end_chirp = int(self["END_CHIRP_TX"])
+        chirp_loops = int(self["CHIRP_LOOPS"])
+        n_chirps = (end_chirp - start_chirp + 1) * chirp_loops
 
-        n_chirps = (int(self['frameCfg'][1]) - int(self['frameCfg'][0]) + 1)*self['frameCfg'][2]
-
-        n_tx = sum(tx)
+        # Determine the number of RX and TX antennas
+        rx = [int(x) for x in self["ar1.ChanNAdcConfig"][3:7]]  # RX1, RX2, RX3, RX4
         n_rx = sum(rx)
 
-        frame_size = n_samples*n_rx*n_chirps*2*(2 if adc_output_fmt > 0 else 1)
-        frame_time = self['frameCfg'][4]
+        tx = [int(x) for x in self["ar1.ChanNAdcConfig"][0:3]]  # TX1, TX2, TX3
+        n_tx = sum(tx)
 
-        range_bias = self['compRangeBiasAndRxChanPhase'][0]
-        # rx_phase_bias = [a + 1j*b for a,b in zip(self['compRangeBiasAndRxChanPhase'][1::2],
-        #                                          self['compRangeBiasAndRxChanPhase'][2::2])]
-        rx_phase_bias = self['compRangeBiasAndRxChanPhase'][1:]
+        # Calculate the number of samples
+        n_samples = self["ADC_SAMPLES"]
 
-        operating_freq = self['profileCfg'][0][1]                         # Units in GHz
-        chirp_time  = self['profileCfg'][0][2] + self['profileCfg'][0][4] # Idle time + ramp time, Units in usec
-        velocity_max = (3e8/(operating_freq*1e9))/(4*(chirp_time*1e-6))   # Units in m
-        velocity_res = velocity_max/n_chirps                              # Units in m
+        # Calculate the frame size
+        frame_size = (
+            n_samples * n_rx * n_chirps * 2 * (2 if adc_output_fmt > 0 else 1)
+        )  # For each chrip we collect n_samples for each rx antenna where each sample is 2 bytes and we collect I and Q if complex
 
-        chirp_slope = self['profileCfg'][0][7]*1e12                       # Units in MHz/usec
-        sample_rate = self['profileCfg'][0][10]*1e3                       # Units in ksps
-        range_max = (sample_rate*3e8)/(2*chirp_slope)                     # Units in m
-        range_res = range_max/n_samples                                   # Units in m
+        # Calculate the frame time
+        frame_time = self["PERIODICITY"]  # in ms
 
-        return OrderedDict([
-            ('sdk', sdk),
-            ('platform', platform),
-            ('adc_output_fmt', adc_output_fmt),
-            ('range_bias', range_bias),
-            ('rx_phase_bias', rx_phase_bias),
-            ('n_chirps', n_chirps),
-            ('rx', rx),
-            ('n_rx', n_rx),
-            ('tx', tx),
-            ('n_tx', n_tx),
-            ('n_samples', n_samples),
-            ('frame_size', frame_size),
-            ('frame_time', frame_time),
-            ('chirp_time', chirp_time),
-            ('chirp_slope', chirp_slope),
-            ('sample_rate', sample_rate),
-            ('velocity_max', velocity_max),
-            ('velocity_res', velocity_res),
-            ('range_max' , range_max),
-            ('range_res' , range_res),
-        ])
-    
+        # Calculate the chirp time
+        chirp_time = self["IDLE_TIME"] + self["RAMP_END_TIME"]  # In us
 
-if __name__ == '__main__':
-    with open('configs/6843aop/6843aop_doppler_v1.cfg', 'r') as f:
-        cfg = f.readlines()
+        # Calculate the chirp slope (convert from MHz/us to Hz/s)
+        chirp_slope = self["FREQ_SLOPE"] * 1e12
 
-    radar_config = RadarConfig(cfg)
-    pprint.pprint(radar_config)
-    pprint.pprint(radar_config.to_cfg())
-    pprint.pprint(radar_config.get_params())
+        # Calculate the sample rate
+        sample_rate = self["SAMPLE_RATE"] * 1e3  # ksps to sps
 
+        # Calculate the sweep time
+        t_sweep = self["ADC_SAMPLES"] / sample_rate  # in seconds
+
+        # Calculate the chirp sampling rate
+        chrip_sampling_rate = chirp_loops * (1 / (frame_time * 1e-3))  # Hz
+
+        # Calculate the maximum velocity
+        operating_freq = self["START_FREQ"] * 1e9  # GHz to Hz
+        wavelength = 3e8 / operating_freq  # lambda = c / f
+        velocity_max = (wavelength) / (4 * chirp_time * 1e-6)  # m/s
+        velocity_res = velocity_max / n_chirps  # m/s
+
+        # Calculate the maximum range
+        range_max = (sample_rate * 3e8) / (2 * chirp_slope)  # m
+        range_res = range_max / n_samples  # m
+
+        return OrderedDict(
+            [
+                ("platform", platform),
+                ("adc_output_fmt", adc_output_fmt),
+                ("n_chirps", n_chirps),
+                ("rx", rx),
+                ("n_rx", n_rx),
+                ("tx", tx),
+                ("n_tx", n_tx),
+                ("n_samples", n_samples),
+                ("frame_size", frame_size),
+                ("frame_time", frame_time),
+                ("chirp_time", chirp_time),
+                ("chirp_slope", chirp_slope),
+                ("sample_rate", sample_rate),
+                ("chirp_sampling_rate", chrip_sampling_rate),
+                ("velocity_max", velocity_max),
+                ("velocity_res", velocity_res),
+                ("range_max", range_max),
+                ("range_res", range_res),
+                ("t_sweep", t_sweep),
+            ]
+        )
+
+
+if __name__ == "__main__":
+    import sys
+
+    if len(sys.argv) != 2:
+        print("Usage: python radar_config.py <path_to_lua_file>")
+        sys.exit(1)
+
+    cfg = RadarConfig(sys.argv[1])
+    pprint.pprint(cfg.get_params())

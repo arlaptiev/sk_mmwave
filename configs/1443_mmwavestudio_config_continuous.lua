@@ -1,31 +1,30 @@
+-- Modified from https://github.com/PreSenseRadar/OpenRadar/blob/master/scripts/1642_mmwavestudio_config.lua
+
 -- Radar Settings (Original)
 -- 3 Tx 4 Rx | complex 1x
 
-
-COM_PORT = 15 -- (UART Application Port)
+COM_PORT = 15
 RADARSS_PATH = "C:\\ti\\mmwave_studio_02_01_01_00\\rf_eval_firmware\\radarss\\xwr12xx_xwr14xx_radarss.bin"
 MASTERSS_PATH = "C:\\ti\\mmwave_studio_02_01_01_00\\rf_eval_firmware\\masterss\\xwr12xx_xwr14xx_masterss.bin"
--- RADARSS_PATH = "C:\\ti\\mmwave_studio_02_01_01_00\\rf_eval_firmware\\radarss\\xwr12xx_xwr14xx_radarss_ES2.0.bin"
--- MASTERSS_PATH = "C:\\ti\\mmwave_studio_02_01_01_00\\rf_eval_firmware\\masterss\\xwr12xx_xwr14xx_masterss_ES2.0.bin"
--- SAVE_DATA_PATH = "C:\\ti\\mmwave_studio_02_01_01_00\\mmWaveStudio\\PostProc\\adc_data.bin"
 SAVE_DATA_PATH = "C:\\mmwave-phone\\raw-data\\adc_data.bin"
 DUMP_DATA_PATH = "C:\\mmwave-phone\\raw-data\\adc_data_RAW_0.bin"
 PKT_LOG_PATH  = "C:\\mmwave-phone\\raw-data\\pktlogfile.txt"
 
+--------------------------------------------
+
 -------- VERY IMPORTANT AND SERIOUS RADAR SETTINGS --------
 -- General
-NUM_TX = 1
+NUM_TX = 3
 NUM_RX = 4
 
 -- ProfileConfig
 START_FREQ = 77 -- GHz
 IDLE_TIME = 100 -- us
-RAMP_END_TIME = 60 -- us
+RAMP_END_TIME = 62 -- us
 ADC_START_TIME = 6 --us
--- FREQ_SLOPE = 29.982 -- MHz/us
 FREQ_SLOPE = 60.012 -- MHz/us
-ADC_SAMPLES = 128
-SAMPLE_RATE = 10000 -- ks/sec
+ADC_SAMPLES = 512
+SAMPLE_RATE = 10000 -- ksps
 RX_GAIN = 30 -- dB
 
 -- ChirpConfig
@@ -35,10 +34,12 @@ RX_GAIN = 30 -- dB
 
 -- FrameConfig
 START_CHIRP_TX = 0
-END_CHIRP_TX = 0 -- 2 for 1843
+END_CHIRP_TX = 0 -- 2 for 1843 
 NUM_FRAMES = 0 -- Set this to 0 to continuously stream data
-CHIRP_LOOPS = 128 --    //32
-PERIODICITY = 100 -- ms  //30
+CHIRP_LOOPS = 4 -- 
+PERIODICITY = 10 -- ms
+
+-- CHIRP_LOOPS / PERIODICITY = CHIRPS_PER_SECOND i.e. the chirp sampling rate
 -----------------------------------------------------------
 
 -------- THIS IS FINE --------
@@ -65,27 +66,27 @@ ar1.GetBSSFwVersion()
 --------
 
 -------- STATIC CONFIG STUFF --------
-ar1.ChanNAdcConfig(1, 0, 0, 1, 1, 1, 1, 2, 1, 0)
+ar1.ChanNAdcConfig(1, 1, 1, 1, 1, 1, 1, 2, 1, 0)
 ar1.LPModConfig(0, 0)
 ar1.RfInit()
 --------------------------------------
 
 -------- DATA CONFIG STUFF --------
-ar1.DataPathConfig(1, 1, 0)
+ar1.DataPathConfig(513, 1216644097, 0)
 ar1.LvdsClkConfig(1, 1)
-ar1.LVDSLaneConfig(0, 1, 1, 1, 1, 1, 0, 0)
+ar1.LVDSLaneConfig(0, 1, 1, 0, 0, 1, 0, 0)
 -----------------------------------
 
 -------- SENSOR CONFIG STUFF --------
 ar1.ProfileConfig(0, START_FREQ, IDLE_TIME, ADC_START_TIME, RAMP_END_TIME, 0, 0, 0, 0, 0, 0, FREQ_SLOPE, 0, ADC_SAMPLES, SAMPLE_RATE, 0, 0, RX_GAIN)
-ar1.ChirpConfig(0, 0, 0, 0, 0, 0, 0, 1, 0, 0)
+ar1.ChirpConfig(0, 0, 0, 0, 0, 0, 0, 1, 1, 0)
 ar1.FrameConfig(START_CHIRP_TX, END_CHIRP_TX, NUM_FRAMES, CHIRP_LOOPS, PERIODICITY, 0, 0, 1)
 -------------------------------------
 
 -------- ETHERNET STUFF --------
 ar1.SelectCaptureDevice("DCA1000")
 ar1.CaptureCardConfig_EthInit("192.168.33.30", "192.168.33.180", "12:34:56:78:90:12", 4096, 4098)
-ar1.CaptureCardConfig_Mode(1, 1, 1, 2, 3, 30)
+ar1.CaptureCardConfig_Mode(1, 2, 1, 2, 3, 30)
 ar1.CaptureCardConfig_PacketDelay(25)
 --------------------------------
 
