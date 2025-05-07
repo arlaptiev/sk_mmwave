@@ -67,15 +67,13 @@ def main():
     parser.add_argument("--cfg",            default='configs/1443_mmwavestudio_config_continuous.lua', type=str, help="Path to the Lua config file")
     parser.add_argument('--host_ip',        default='192.168.33.30', help='IP address of host.')
     parser.add_argument('--host_data_port', default=4098, type=int, help='Data port of host.')
-    # phone args
 
     args = parser.parse_args()
 
     # Start the radar node
     setup_logging_file("radar", ['node', 'data', 'timestamp'])
-    Radar(args, callback=record)
-
-    # Start the phone node
+    radar = Radar(args, callback=record)
+    radar.run_polling()
 
 
 

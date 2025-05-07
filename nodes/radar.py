@@ -51,6 +51,8 @@ class Radar:
                     # from harware-level kernel timestamps. Can try to get hardware timestamps (but works only on Linux)
                     timestamp = datetime.now()
                     frame_data = reshape_frame(raw_frame_data, self.params['n_chirps'], self.params['n_samples'], self.params['n_rx'])
+
+                    # frame_data is shaped as (n_chirps, n_samples, n_rx)
                     radar_msg = {'data': frame_data, 'node': 'radar', 'timestamp': timestamp}
 
                     if self.callback:
