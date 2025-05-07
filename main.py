@@ -11,6 +11,19 @@ from nodes.radar import init_radar_node
 from nodes.phone import listen_to_phone
 
 
+# radar_buf = [{'data': frame_data, 'node': 'radar', 'timestamp': timestamp}]
+radar_buf = []
+
+# is called when the TCP packet from phone arrives
+def check_the_box(phone_lidar_msg, phone_socket):
+    # phone_lidar_msg: {'data': lidar_frame_data, 'node': 'lidar', 'timestamp': timestamp}
+    # checks radar buffer for the correct frame
+        # go through the radar_buf and find the closest record 
+    # calls detection function
+    # sends a response to phone
+    pass
+
+
 def add_to_buf(radar_msg):
     pass
 
