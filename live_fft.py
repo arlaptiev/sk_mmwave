@@ -14,9 +14,6 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from nodes.radar import Radar
 
-# style
-plt.style.use('dark_background')
-
 
 
 # Global variables for plot handles (to update instead of redrawing)
@@ -38,45 +35,35 @@ def display_frame(message):
     SAMPLES_PER_CHIRP = params['n_samples']         # adc number of samples per chirp
     SAMPLE_RATE = params['sample_rate']             # digout sample rate in Hz
     FREQ_SLOPE = params['chirp_slope']              # frequency slope in Hz (/s)
-    PERIODICITY = params['frame_time']              # frame periodicity in ms
 
-    # plot at DISPLAY_RATE
-    global frame_display_counter
-    DISPLAY_RATE = 500                              # display rate in ms
-
-    if frame_display_counter % (DISPLAY_RATE // PERIODICITY) == 0:
-        # average over all chirps
-        avg_chirps = np.mean(frame, axis=0) # shape: (n_samples, n_rx)
+    # average over all chirps
+    avg_chirps = np.mean(frame, axis=0) # shape: (n_samples, n_rx)
 
 
-        signal = avg_chirps[:, 0]           # shape: (n_samples,)
-        fft_result = fft(signal)
-        fft_freqs = fftfreq(SAMPLES_PER_CHIRP, 1/SAMPLE_RATE)
-        fft_meters = fft_freqs * c / (2 * FREQ_SLOPE)
-        
-        # Update time domain plot
-        line_time.set_data(np.arange(len(signal)), signal)
-        ax_time.set_xlim(0, len(signal))
-        ax_time.set_ylim(np.min(signal), np.max(signal))
-        ax_time.set_title('Time Domain Signals')
-        ax_time.set_xlabel('Sample Index')
-        ax_time.set_ylabel('Amplitude')
+    signal = avg_chirps[:, 0]           # shape: (n_samples,)
+    fft_result = fft(signal)
+    fft_freqs = fftfreq(SAMPLES_PER_CHIRP, 1/SAMPLE_RATE)
+    fft_meters = fft_freqs * c / (2 * FREQ_SLOPE)
+    
+    # Update time domain plot
+    line_time.set_data(np.arange(len(signal)), signal)
+    ax_time.set_xlim(0, len(signal))
+    ax_time.set_ylim(np.min(signal), np.max(signal))
+    ax_time.set_title('Time Domain Signals')
+    ax_time.set_xlabel('Sample Index')
+    ax_time.set_ylabel('Amplitude')
 
-        # Update frequency domain plot
-        half_range = SAMPLES_PER_CHIRP // 2
-        line_freq.set_data(fft_meters[:half_range], np.abs(fft_result[:half_range]))
-        ax_freq.set_xlim(fft_meters[0], fft_meters[half_range-1])
-        ax_freq.set_ylim(0, np.max(np.abs(fft_result[:half_range])) * 1.1)
-        ax_freq.set_title('Frequency Domain Signals')
-        ax_freq.set_xlabel('Distance (m)')
-        ax_freq.set_ylabel('Magnitude')
+    # Update frequency domain plot
+    half_range = SAMPLES_PER_CHIRP // 2
+    line_freq.set_data(fft_meters[:half_range], np.abs(fft_result[:half_range]))
+    ax_freq.set_xlim(fft_meters[0], fft_meters[half_range-1])
+    ax_freq.set_ylim(0, np.max(np.abs(fft_result[:half_range])) * 1.1)
+    ax_freq.set_title('Frequency Domain Signals')
+    ax_freq.set_xlabel('Distance (m)')
+    ax_freq.set_ylabel('Magnitude')
 
-        plt.xlim(0,2)
-        plt.pause(0.001)
-        
-        frame_display_counter = 1
-    else:
-        frame_display_counter += 1
+    plt.xlim(0,2)
+    plt.pause(0.001)
 
 
 
