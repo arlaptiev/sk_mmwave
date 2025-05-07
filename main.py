@@ -12,7 +12,7 @@ from nodes.phone import listen_to_phone
 
 
 # radar_buf = [{'data': frame_data, 'node': 'radar', 'timestamp': timestamp}]
-radar_buf = []
+radar_buf = [None] * 10000
 
 # is called when the TCP packet from phone arrives
 def check_the_box(phone_lidar_msg, phone_socket):
@@ -25,7 +25,8 @@ def check_the_box(phone_lidar_msg, phone_socket):
 
 
 def add_to_buf(radar_msg):
-    pass
+    radar_buf.pop(0)
+    radar_buf.append(radar_msg)
 
 
 def main():
@@ -40,8 +41,8 @@ def main():
     args = parser.parse_args()
 
     # make radar thread
-    Radar(args, callback=print)
-    # radar_thread = threading.Thread(init_radar_node(args, callback=print)) 
+    radar = Radar(args, callback=print)
+    radar_thread = threading.Thread(radar.run_polling(args, callback=print)) 
 
     # make phone thread
     #phone_thread = threading.Thread(listen_to_phone(callback=check_the_box))

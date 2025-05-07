@@ -33,13 +33,16 @@ class Radar:
             host_ip=args.host_ip,
             host_data_port=int(args.host_data_port)
         )
-        self.params = self.dca.params
 
+        self.params = self.dca.params
         print("[INFO] Radar params:")
         for p in self.params:
             print(p, ':', self.params[p])
-        print("[INFO] Radar connected. Starting data capture...")
 
+        self.callback = callback
+
+    def run_polling(self):
+        print("[INFO] Radar connected. Starting data capture...")
         try:
             while True:
                 raw_frame_data, new_frame = self.dca.update_frame_buffer()
@@ -50,8 +53,8 @@ class Radar:
                     frame_data = reshape_frame(raw_frame_data, self.params['n_chirps'], self.params['n_samples'], self.params['n_rx'])
                     radar_msg = {'data': frame_data, 'node': 'radar', 'timestamp': timestamp}
 
-                    if callback:
-                        callback(radar_msg)
+                    if self.callback:
+                        self.callback(radar_msg)
 
                 # time.sleep(0.01)  # Prevents busy-looping
         except KeyboardInterrupt:

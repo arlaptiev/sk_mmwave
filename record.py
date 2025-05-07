@@ -10,7 +10,7 @@ import numpy as np
 # Add the project root and sibling directories to PYTHONPATH
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-from nodes.radar import init_radar_node
+from nodes.radar import Radar
 
 
 
