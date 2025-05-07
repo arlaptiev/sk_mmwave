@@ -11,12 +11,15 @@ from nodes.radar import init_radar_node
 from nodes.phone import listen_to_phone
 
 
+def add_to_buf(radar_msg):
+    pass
+
 
 def main():
     parser = argparse.ArgumentParser(description="Start the mmWave Radar Node.")
 
     # radar args
-    parser.add_argument("--lua",            default='configs/1443_mm_config_continuous.lua', type=str, help="Path to the Lua config file")
+    parser.add_argument("--lua",            default='configs/1443_mmwavestudio_config_continuous.lua', type=str, help="Path to the Lua config file")
     parser.add_argument('--host_ip',        default='192.168.33.30', help='IP address of host.')
     parser.add_argument('--host_data_port', default=4098, type=int, help='Data port of host.')
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
@@ -29,11 +32,13 @@ def main():
     radar_thread = threading.Thread(init_radar_node(args, callback=print, verbose=args.verbose)) 
 
     # make phone thread
-    #phone_thread = threading.Thread(listen_to_phone())
+    #phone_thread = threading.Thread(listen_to_phone(callback=check_the_box))
 
     # start all threads
     radar_thread.start()
     #phone_thread.start()
+
+
 
 
 

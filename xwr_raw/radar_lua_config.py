@@ -183,7 +183,7 @@ class LuaRadarConfig(OrderedDict):
 
 
 if __name__ == '__main__':
-    with open('configs/1443/1443_mmwavestudio_config.lua', 'r') as f:
+    with open('../configs/1443_mmwavestudio_config.lua', 'r') as f:
         lua_lines = f.readlines()
 
     lua_config = LuaRadarConfig(lua_lines)

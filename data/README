@@ -45,3 +45,26 @@ box on top of table
 
 Table-to-radar: 0.68m
 Table-to-topbox: 0.16m
+
+
+
+EXPERIMENT 0
+
+SETUP 1
+No box
+Radar-to-floor: 150cm
+Box-to-floor: 77cm
+
+SETUP 2
+Box 
+Radar-to-floor: 150cm
+Radar-to-box: 50cm
+
+SETUP 3
+Box + obj
+Radar-to-obj: 
+
+
+SETUP 4
+Box + elevated obj
+Radar-to-obj

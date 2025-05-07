@@ -27,7 +27,6 @@ class DCADataPub():
                                host_ip=host_ip,
                                host_cmd_port=None,
                                host_data_port=host_data_port)
-        self.dca1000.capturing = True
 
         if hasattr(self.dca1000, 'data_socket'):
             self.dca1000.data_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 131071*5)
@@ -37,4 +36,6 @@ class DCADataPub():
     def update_frame_buffer(self):
         seqn, bytec, msg = self.dca1000.recv_data()
         frame_data, new_frame = self.frame_buffer.add_msg(seqn, msg)
+        print('seqn', seqn)
+        print('new_frame', new_frame)
         return frame_data, new_frame

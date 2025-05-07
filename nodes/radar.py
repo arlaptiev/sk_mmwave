@@ -9,7 +9,6 @@ from datetime import datetime
 import argparse
 import numpy as np
 
-from xwr_raw.radar_lua_config import LuaRadarConfig
 from xwr_raw.dca_data_pub import DCADataPub
 
 
@@ -49,6 +48,8 @@ def init_radar_node(args, callback=None, verbose=False):
     try:
         while True:
             frame_data, new_frame = radar.update_frame_buffer()
+            print('frame data len', len(frame_data))
+            print('new frame', new_frame)
             if new_frame:
                 # NOTE: this timestamp is python application-level timestamp. Is  different 
                 # from harware-level kernel timestamps. Can try to get hardware timestamps (but works only on Linux)
