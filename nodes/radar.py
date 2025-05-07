@@ -36,8 +36,7 @@ class Radar:
 
         self.params = self.dca.params
         print("[INFO] Radar params:")
-        for p in self.params:
-            print(p, ':', self.params[p])
+        print(self.dca.config)
 
         self.callback = callback
 

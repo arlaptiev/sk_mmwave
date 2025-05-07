@@ -160,6 +160,46 @@ class RadarConfig(OrderedDict):
             ]
         )
 
+    def __str__(self):
+        """
+        Returns a nicely formatted string with all the radar configuration parameters
+        and appropriate units.
+        """
+        try:
+            params = self.get_params()
+        except Exception as e:
+            return f"Error generating config parameters: {e}"
+
+        # Define units for known parameters
+        units = {
+            "frame_time": "ms",
+            "chirp_time": "µs",
+            "chirp_slope": "Hz/s",
+            "sample_rate": "samples/s",
+            "chirp_sampling_rate": "Hz",
+            "velocity_max": "m/s",
+            "velocity_res": "m/s",
+            "range_max": "m",
+            "range_res": "m",
+            "t_sweep": "s",
+            "frame_size": "bytes",
+        }
+
+        # Format each parameter with units if known
+        lines = []
+        for key, value in params.items():
+            if isinstance(value, list):
+                value_str = ", ".join(str(v) for v in value)
+            elif isinstance(value, float):
+                value_str = f"{value:.4f}"
+            else:
+                value_str = str(value)
+
+            unit = units.get(key, "")
+            lines.append(f"{key:25}: {value_str} {unit}".rstrip())
+
+        return "\n".join(lines)
+
 
 if __name__ == "__main__":
     import sys
