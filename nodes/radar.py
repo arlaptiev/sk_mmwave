@@ -53,7 +53,7 @@ class Radar:
                     frame_data = reshape_frame(raw_frame_data, self.params['n_chirps'], self.params['n_samples'], self.params['n_rx'])
 
                     # frame_data is shaped as (n_chirps, n_samples, n_rx)
-                    radar_msg = {'data': frame_data, 'node': 'radar', 'timestamp': timestamp}
+                    radar_msg = {'data': frame_data, 'node': 'radar', 'timestamp': timestamp, 'params': self.params}
 
                     if self.callback:
                         self.callback(radar_msg)
