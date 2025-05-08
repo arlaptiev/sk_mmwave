@@ -62,3 +62,6 @@ class DCAPub:
         seqn, bytec, msg = self.dca1000.recv_data()
         frame_data, new_frame = self.frame_buffer.add_msg(seqn, msg)
         return frame_data, new_frame
+    
+    def close(self):
+        self.dca1000.close()

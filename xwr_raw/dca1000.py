@@ -98,6 +98,7 @@ class DCA1000:
         return seqn, bytec, msg[10:]
 
     def close(self):
-        self.cmd_socket.close()
+        if hasattr(self, "cmd_socket"):
+            self.cmd_socket.close()
         if hasattr(self, "data_socket"):
             self.data_socket.close()

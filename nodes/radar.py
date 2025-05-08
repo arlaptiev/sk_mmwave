@@ -57,6 +57,8 @@ class Radar:
                         callback(radar_msg)
 
         except KeyboardInterrupt:
+            self.close()
+            del self
             print("[INFO] Stopping radar capture.")
 
 
