@@ -26,7 +26,6 @@ plt.ion()  # Enable interactive mode
 plt.show()
 
 
-
 def display_frame(message):
     frame = message.get("data", None)
     params = message.get("params", None)
