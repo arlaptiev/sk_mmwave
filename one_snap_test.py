@@ -33,9 +33,7 @@ sock.bind((UDP_IP, UDP_PORT))
 
 print(f"Listening on UDP {UDP_PORT}...")
 
-def send_to_phone(message, phone_ip, phone_port):
-    sock.sendto(message.encode(), (phone_ip, phone_port))
-    print(f"Sent message to {phone_ip}:{phone_port}")
+addr = ""
 
 # if phone presses snap, then run radar file 
 while True:
@@ -44,6 +42,12 @@ while True:
     print(f"Received message from {addr}: {message}")
     if message == "RADAR STARTING DATA CAPTURE NOW":
         break
+    
+
+def send_to_phone(message, addr):
+    sock.sendto(message.encode(), addr)
+    print(f"Sent message to {phone_ip}:{phone_port}")
+
 
 
 
@@ -61,6 +65,9 @@ fft_magnitude = np.abs(fft_result[:SAMPLES_PER_CHIRP // 2])
 fft_freqs = fftfreq(SAMPLES_PER_CHIRP, 1/SAMPLE_RATE)
 fft_meters = fft_freqs[:SAMPLES_PER_CHIRP // 2] * c / (2 * FREQ_SLOPE)
 
+# ==== find low and high bounds from lidar data
+low_bound = 0.5
+high_bound = 5
 
 # ==== find peaks with distances
 range_mask = (fft_meters >= low_bound) & (fft_meters <= high_bound)
@@ -74,6 +81,9 @@ detection = any(fft_magnitude > THRESHOLD)
 
 
 # ==== send boolean back to phone if box empty or not
-phone_ip = "192.168.41.171"
+phone_ip = "192.168.41.215"
 phone_port = 6000
-send_to_phone("TRUE", phone_ip, phone_port)
+if detection:
+  send_to_phone("TRUE", addr)
+else:
+  send_to_phone("FALSE", addr)
