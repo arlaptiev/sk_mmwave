@@ -78,6 +78,10 @@ class Radar:
         except KeyboardInterrupt:
             print("[INFO] Stopping frame capture.")
 
+    
+    def close(self):
+        self.dca.close()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Run radar data publisher without ROS.")
