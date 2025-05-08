@@ -41,8 +41,8 @@ def main():
     args = parser.parse_args()
 
     # make radar thread
-    radar = Radar(args, callback=print)
-    radar_thread = threading.Thread(radar.run_polling()) 
+    radar = Radar(args)
+    radar_thread = threading.Thread(radar.run_polling(callback=print)) 
 
     # make phone thread
     #phone_thread = threading.Thread(listen_to_phone(callback=check_the_box))

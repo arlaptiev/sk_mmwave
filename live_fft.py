@@ -24,7 +24,6 @@ line_freq, = ax_freq.plot([], [])
 plt.ion()  # Enable interactive mode
 plt.show()
 
-frame_display_counter = 0
 
 def display_frame(message):
     frame = message.get("data", None)
@@ -36,15 +35,15 @@ def display_frame(message):
     SAMPLE_RATE = params['sample_rate']             # digout sample rate in Hz
     FREQ_SLOPE = params['chirp_slope']              # frequency slope in Hz (/s)
 
-    # average over all chirps
+    # -- Processing --
     avg_chirps = np.mean(frame, axis=0) # shape: (n_samples, n_rx)
+    signal = avg_chirps                 # shape: (n_samples, n_rx)
 
-
-    signal = avg_chirps[:, 0]           # shape: (n_samples,)
     fft_result = fft(signal)
     fft_freqs = fftfreq(SAMPLES_PER_CHIRP, 1/SAMPLE_RATE)
     fft_meters = fft_freqs * c / (2 * FREQ_SLOPE)
     
+    # -- Plotting --
     # Update time domain plot
     line_time.set_data(np.arange(len(signal)), signal)
     ax_time.set_xlim(0, len(signal))
@@ -79,8 +78,8 @@ def main():
     args = parser.parse_args()
 
     # Start the radar node
-    radar = Radar(args, callback=display_frame)
-    radar.run_polling()
+    radar = Radar(args)
+    radar.run_polling(callback=display_frame)
 
 
 

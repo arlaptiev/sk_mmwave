@@ -14,7 +14,7 @@ from xwr_raw.dsp import reshape_frame
 
 
 class Radar:
-    def __init__(self, args, callback=None):
+    def __init__(self, args):
         """Initializes radar capture and starts publishing frames.
 
         Args:
@@ -33,15 +33,14 @@ class Radar:
             host_ip=args.host_ip,
             host_data_port=int(args.host_data_port)
         )
-
+        
+        self.config = self.dca.config
         self.params = self.dca.params
-        print("[INFO] Radar params:")
+        print("[INFO] Radar connected. Params:")
         print(self.dca.config)
 
-        self.callback = callback
-
-    def run_polling(self):
-        print("[INFO] Radar connected. Starting data capture...")
+    def run_polling(self, callback=None):
+        print("[INFO] Starting data capture...")
         try:
             while True:
                 raw_frame_data, new_frame = self.dca.update_frame_buffer()
@@ -54,12 +53,30 @@ class Radar:
                     # frame_data is shaped as (n_chirps, n_samples, n_rx)
                     radar_msg = {'data': frame_data, 'node': 'radar', 'timestamp': timestamp, 'params': self.params}
 
-                    if self.callback:
-                        self.callback(radar_msg)
+                    if callback:
+                        callback(radar_msg)
 
-                # time.sleep(0.01)  # Prevents busy-looping
         except KeyboardInterrupt:
             print("[INFO] Stopping radar capture.")
+
+
+    def read(self):
+        """Reads a single full frame of radar data."""
+        discared_incomplete = False
+
+        try:
+            while True:
+                raw_frame_data, new_frame = self.dca.update_frame_buffer()
+                if new_frame:
+                    # discard incomplete frame
+                    if not discared_incomplete:
+                        discared_incomplete = True
+                    else:
+                        frame_data = reshape_frame(raw_frame_data, self.params['n_chirps'], self.params['n_samples'], self.params['n_rx'])
+                        return frame_data
+
+        except KeyboardInterrupt:
+            print("[INFO] Stopping frame capture.")
 
 
 if __name__ == '__main__':

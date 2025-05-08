@@ -72,8 +72,8 @@ def main():
 
     # Start the radar node
     setup_logging_file("radar", ['node', 'data', 'timestamp'])
-    radar = Radar(args, callback=record)
-    radar.run_polling()
+    radar = Radar(args)
+    radar.run_polling(callback=record)
 
 
 
