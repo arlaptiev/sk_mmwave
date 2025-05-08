@@ -13,4 +13,8 @@ Radar-to-boxtop = 0.5m
 
 
 Decrease the strength of the boxbtm surface to improve obj resolution?
+- Use box-on-box setup
+
+
+- 
 
