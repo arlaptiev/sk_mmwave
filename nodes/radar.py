@@ -28,22 +28,26 @@ class Radar:
         print(f"[INFO] Starting radar node with config: {args.cfg}")
         print(f"[INFO] Connecting radar with host {args.host_ip}:{args.host_data_port}")
 
-        self.dca = DCAPub(
+        self.dcapub = DCAPub(
             cfg=args.cfg,
             host_ip=args.host_ip,
             host_data_port=int(args.host_data_port)
         )
-        
-        self.config = self.dca.config
-        self.params = self.dca.params
+
+        self.config = self.dcapub.config
+        self.params = self.dcapub.params
         print("[INFO] Radar connected. Params:")
-        print(self.dca.config)
+        print(self.dcapub.config)
 
     def run_polling(self, callback=None):
         print("[INFO] Starting data capture...")
+        
+        # flush the data buffer
+        self.dcapub.dca1000.flush_data_socket()
+
         try:
             while True:
-                raw_frame_data, new_frame = self.dca.update_frame_buffer()
+                raw_frame_data, new_frame = self.dcapub.update_frame_buffer()
                 if new_frame:
                     # NOTE: this timestamp is python application-level timestamp. Is  different 
                     # from harware-level kernel timestamps. Can try to get hardware timestamps (but works only on Linux)
@@ -64,9 +68,12 @@ class Radar:
         """Reads a single full frame of radar data."""
         discared_incomplete = False
 
+        # flush the data buffer
+        self.dcapub.dca1000.flush_data_socket()
+
         try:
             while True:
-                raw_frame_data, new_frame = self.dca.update_frame_buffer()
+                raw_frame_data, new_frame = self.dcapub.update_frame_buffer()
                 if new_frame:
                     # discard incomplete frame
                     if not discared_incomplete:
