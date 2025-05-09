@@ -19,6 +19,7 @@ class Lidar:
         self.port = port
         self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.prev_addr = ""
 
     def run_polling(self, callback=None):
         """Begins listening for incoming connections and handles them."""
@@ -28,6 +29,7 @@ class Lidar:
 
         while True:
             conn, addr = self.server_sock.accept()
+            self.prev_addr = addr
             print(f"[INFO] Connected by {addr}")
             try:
                 with conn.makefile('rb') as f:
@@ -82,6 +84,7 @@ class Lidar:
         print(f"[INFO] Waiting for a single connection on {self.host}:{self.port}...")
 
         conn, addr = self.server_sock.accept()
+        self.prev_addr = addr
         print(f"[INFO] Connected by {addr}")
         try:
             with conn.makefile('rb') as f:

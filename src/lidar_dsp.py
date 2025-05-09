@@ -88,4 +88,10 @@ def detect_planes_and_box(cv2_image, depth_map, meta):
         Yb = (vb - cy) * Zb / fy
         box_dist = np.sqrt(Xb ** 2 + Yb ** 2 + Zb ** 2)
 
+    
+    # subtract radar-to-lidar distance (5cm)
+    floor_dist = floor_dist - 0.05
+    box_dist = box_dist - 0.05
+    table_dist = table_dist - 0.05
+
     return floor_dist, box_dist, table_dist

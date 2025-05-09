@@ -58,9 +58,9 @@ print('Table distance', table_dist)
 #         break
     
 
-# def send_to_phone(message, addr):
-#     sock.sendto(message.encode(), addr)
-#     print(f"Sent message to {phone_ip}:{phone_port}")
+def send_to_phone(message, addr, sock):
+    sock.sendto(message.encode(), addr)
+    print(f"Sent message")
 
 
 
@@ -96,9 +96,15 @@ detection = any(fft_magnitude > THRESHOLD)
 
 # ==== send boolean back to phone if box empty or not
 print("Detection", detection)
-# phone_ip = "192.168.41.215"
-# phone_port = 6000
-# if detection:
-#   send_to_phone("TRUE", addr)
-# else:
-#   send_to_phone("FALSE", addr)
+phone_ip = "192.168.41.178"
+phone_port = 6000
+UDP_IP = "0.0.0.0"  # Listen on all interfaces
+UDP_PORT = 5005
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.bind((UDP_IP, UDP_PORT))
+#data, addr = sock.recvfrom(1024)
+if detection:
+  send_to_phone("TRUE", lidar.prev_addr, sock)
+else:
+  send_to_phone("FALSE", lidar.prev_addr, sock)
