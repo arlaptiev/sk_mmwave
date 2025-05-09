@@ -8,7 +8,7 @@ import threading
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from nodes.radar import Radar
-from nodes.phone import listen_to_phone
+from nodes.phone_node import listen_to_phone
 
 
 # radar_buf = [{'data': frame_data, 'node': 'radar', 'timestamp': timestamp}]

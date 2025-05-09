@@ -8,8 +8,8 @@ import base64
 import socket
 import argparse
 from datetime import datetime
-import io
 import numpy as np
+import cv2
 
 
 class Lidar:
@@ -19,7 +19,6 @@ class Lidar:
         self.port = port
         self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        os.makedirs('captures', exist_ok=True)
 
     def run_polling(self, callback=None):
         """Begins listening for incoming connections and handles them."""
@@ -51,12 +50,17 @@ class Lidar:
                 depth_bytes = base64.b64decode(frame['depth'])
                 meta = frame.get('meta', {})
 
+                # bytes to depth map
                 W, H = 256, 192
-                depth_map = np.load(io.BytesIO(depth_bytes))
-                depth_map = depth_map.reshape((H, W))
+                depth_array = np.frombuffer(depth_bytes, dtype=np.float32)
+                depth_map = depth_array.reshape((H, W))
+
+                # bytes to img
+                img_array = np.frombuffer(img_bytes, dtype=np.uint8)
+                cv2_image = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
 
                 # radar_msg = {'data': frame_data, 'node': 'radar', 'timestamp': timestamp, 'params': self.params}
-                lidar_msg = {'data': {'img_bytes': img_bytes, 'depth_map': depth_map}, 'node': 'lidar', 'timestamp': now, 'meta': meta}
+                lidar_msg = {'data': {'img': cv2_image, 'depth_map': depth_map, 'meta': meta}, 'node': 'lidar', 'timestamp': now}
 
                 if callback:
                     callback(lidar_msg)
@@ -71,7 +75,7 @@ class Lidar:
         """Reads a single JSON-encoded frame from the next incoming connection.
 
         Returns:
-            tuple: (img_bytes, depth_bytes, meta) if successful, else None
+            tuple: (img, depth_map, meta) if successful, else None
         """
         self.server_sock.bind((self.host, self.port))
         self.server_sock.listen()
@@ -97,7 +101,16 @@ class Lidar:
             depth_bytes = base64.b64decode(frame['depth'])
             meta = frame.get('meta', {})
 
-            return img_bytes, depth_bytes, meta
+            # bytes to depth map
+            W, H = 256, 192
+            depth_array = np.frombuffer(depth_bytes, dtype=np.float32)
+            depth_map = depth_array.reshape((H, W))
+
+            # bytes to img
+            img_array = np.frombuffer(img_bytes, dtype=np.uint8)
+            cv2_image = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+
+            return cv2_image, depth_map, meta
 
         except Exception as e:
             print(f"[ERROR] Error during read: {e}")
