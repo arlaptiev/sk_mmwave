@@ -66,8 +66,8 @@ fft_freqs = fftfreq(SAMPLES_PER_CHIRP, 1/SAMPLE_RATE)
 fft_meters = fft_freqs[:SAMPLES_PER_CHIRP // 2] * c / (2 * FREQ_SLOPE)
 
 # ==== find low and high bounds from lidar data
-low_bound = 0.5
-high_bound = 5
+low_bound = 0.7
+high_bound = 1
 
 # ==== find peaks with distances
 range_mask = (fft_meters >= low_bound) & (fft_meters <= high_bound)
