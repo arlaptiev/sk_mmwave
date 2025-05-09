@@ -72,7 +72,7 @@ def main():
 
     # Start the radar node
     radar = Radar(args)
-    radar.run_polling(callback=display_frame)
+    radar.run_polling(callback=display_frame, lose_frames=True)
 
 
 

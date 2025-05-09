@@ -118,8 +118,7 @@ class Lidar:
         finally:
             conn.close()
             self.close()
-
-        
+  
 
     def close(self):
         self.server_sock.close()

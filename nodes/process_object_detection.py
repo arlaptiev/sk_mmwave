@@ -44,7 +44,7 @@ def load_depth_bin(path, shape):
     return d.reshape(shape)
 
 if __name__ == "__main__":
-    IMG, DEP, META = "captures/sample_data/frame_sample.jpg", "captures/sample_data/depth_sample.bin", "captures/sample_data/meta_sample.json"
+    IMG, DEP, META = "captures/2025-05-09_15-59-08.112/frame.jpg", "captures/2025-05-09_15-59-08.112/depth.bin", "captures/2025-05-09_15-59-08.112/meta.json"
     Hd, Wd = 192, 256
 
     img = cv2.imread(IMG)

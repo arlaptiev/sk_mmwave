@@ -65,6 +65,9 @@ def listen_to_phone():
             finally:
                 conn.close()
 
+    @staticmethod
+    
+
 
 if __name__ == '__main__':
     listen_to_phone()

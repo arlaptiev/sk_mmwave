@@ -9,6 +9,14 @@ from scipy.fft import fft, fftfreq
 from scipy.signal import windows
 from scipy.fft import fftshift
 
+from nodes.phone_node import Lidar
+from src.lidar_dsp import detect_planes_and_box
+
+
+# TODO add the send to phone functionality
+
+
+
 # ==== initialize radar and set params
 args = SimpleNamespace(**{
   'cfg': 'configs/1443_mmwavestudio_config_continuous.lua',
@@ -24,29 +32,35 @@ FREQ_SLOPE = radar.params['chirp_slope']                # frequency slope in Hz 
 
 
 
+
+
 # ==== initialize phone socket
-UDP_IP = "0.0.0.0"  # Listen on all interfaces
-UDP_PORT = 5005
+lidar = Lidar()
+img, depth_map, meta = lidar.read()
+floor_dist, box_dist, table_dist = detect_planes_and_box(img, depth_map, meta)
+print('Table distance', table_dist)
+# UDP_IP = "0.0.0.0"  # Listen on all interfaces
+# UDP_PORT = 5005
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind((UDP_IP, UDP_PORT))
+# sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+# sock.bind((UDP_IP, UDP_PORT))
 
-print(f"Listening on UDP {UDP_PORT}...")
+# print(f"Listening on UDP {UDP_PORT}...")
 
-addr = ""
+# addr = ""
 
-# if phone presses snap, then run radar file 
-while True:
-    data, addr = sock.recvfrom(1024)
-    message = data.decode().strip()
-    print(f"Received message from {addr}: {message}")
-    if message == "RADAR STARTING DATA CAPTURE NOW":
-        break
+# # if phone presses snap, then run radar file 
+# while True:
+#     data, addr = sock.recvfrom(1024)
+#     message = data.decode().strip()
+#     print(f"Received message from {addr}: {message}")
+#     if message == "RADAR STARTING DATA CAPTURE NOW":
+#         break
     
 
-def send_to_phone(message, addr):
-    sock.sendto(message.encode(), addr)
-    print(f"Sent message to {phone_ip}:{phone_port}")
+# def send_to_phone(message, addr):
+#     sock.sendto(message.encode(), addr)
+#     print(f"Sent message to {phone_ip}:{phone_port}")
 
 
 
@@ -66,8 +80,8 @@ fft_freqs = fftfreq(SAMPLES_PER_CHIRP, 1/SAMPLE_RATE)
 fft_meters = fft_freqs[:SAMPLES_PER_CHIRP // 2] * c / (2 * FREQ_SLOPE)
 
 # ==== find low and high bounds from lidar data
-low_bound = 0.7
-high_bound = 1
+low_bound = floor_dist
+high_bound = table_dist
 
 # ==== find peaks with distances
 range_mask = (fft_meters >= low_bound) & (fft_meters <= high_bound)
@@ -81,9 +95,10 @@ detection = any(fft_magnitude > THRESHOLD)
 
 
 # ==== send boolean back to phone if box empty or not
-phone_ip = "192.168.41.215"
-phone_port = 6000
-if detection:
-  send_to_phone("TRUE", addr)
-else:
-  send_to_phone("FALSE", addr)
+print("Detection", detection)
+# phone_ip = "192.168.41.215"
+# phone_port = 6000
+# if detection:
+#   send_to_phone("TRUE", addr)
+# else:
+#   send_to_phone("FALSE", addr)

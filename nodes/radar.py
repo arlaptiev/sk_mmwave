@@ -39,7 +39,7 @@ class Radar:
         print("[INFO] Radar connected. Params:")
         print(self.dcapub.config)
 
-    def run_polling(self, callback=None):
+    def run_polling(self, callback=None, lose_frames=False):
         print("[INFO] Starting data capture...")
         
         # flush the data buffer
@@ -59,6 +59,9 @@ class Radar:
 
                     if callback:
                         callback(radar_msg)
+
+                    if lose_frames:
+                       self.dcapub.dca1000.flush_data_socket() 
 
         except KeyboardInterrupt:
             self.close()
