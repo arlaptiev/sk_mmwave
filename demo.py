@@ -76,7 +76,7 @@ fft_meters = fft_meters[range_mask]
 
 
 # ==== check if there is a strong peak at an inside box distance
-THRESHOLD = 3000
+THRESHOLD = 450000
 detection = any(fft_magnitude > THRESHOLD)
 
 
