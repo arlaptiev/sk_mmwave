@@ -8,6 +8,8 @@ import base64
 import socket
 import argparse
 from datetime import datetime
+import io
+import numpy as np
 
 
 class Lidar:
@@ -49,8 +51,12 @@ class Lidar:
                 depth_bytes = base64.b64decode(frame['depth'])
                 meta = frame.get('meta', {})
 
+                W, H = 256, 192
+                depth_map = np.load(io.BytesIO(depth_bytes))
+                depth_map = depth_map.reshape((H, W))
+
                 # radar_msg = {'data': frame_data, 'node': 'radar', 'timestamp': timestamp, 'params': self.params}
-                lidar_msg = {'data': {'img_bytes': img_bytes, 'depth_bytes': depth_bytes}, 'node': 'lidar', 'timestamp': now, 'meta': meta}
+                lidar_msg = {'data': {'img_bytes': img_bytes, 'depth_map': depth_map}, 'node': 'lidar', 'timestamp': now, 'meta': meta}
 
                 if callback:
                     callback(lidar_msg)
@@ -98,6 +104,7 @@ class Lidar:
             return None
         finally:
             conn.close()
+            self.close()
 
         
 
@@ -111,7 +118,7 @@ if __name__ == '__main__':
     parser.add_argument('--port', default=5005, type=int, help="TCP port to listen on.")
     args = parser.parse_args()
 
-    server = PhoneCaptureServer(host=args.host, port=args.port)
+    server = Lidar(host=args.host, port=args.port)
     try:
         server.listen()
     except KeyboardInterrupt:
