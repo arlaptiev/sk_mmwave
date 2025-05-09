@@ -5,6 +5,7 @@ Radar-to-floor/table = 1m
 Radar-to-topbox = 0.7m
 
 SETUP 2
+Box on top of the box
 Radar-to-boxbtm = 1.2m
 Radar-to-boxtop = 0.5m
 33
@@ -14,3 +15,5 @@ Radar-to-boxtop = 0.5m
 
 Decrease the strength of the boxbtm surface to improve obj resolution?
 
+SETUP 2
+Box on top of the large box
