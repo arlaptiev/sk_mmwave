@@ -12,8 +12,12 @@ from scipy.fft import fftshift
 from nodes.phone_node import Lidar
 from src.lidar_dsp import detect_planes_and_box
 
+import time
+
 
 while True:
+
+  start_time = time.time()
 
   # ==== initialize radar and set params
   args = SimpleNamespace(**{
@@ -29,14 +33,27 @@ while True:
   FREQ_SLOPE = radar.params['chirp_slope']                # frequency slope in Hz (/s)
 
 
+  radar_init_time = time.time()
 
-
+  print("[TIME] Radar took", radar_init_time - start_time, "seconds to init")
 
   # ==== initialize phone socket
   lidar = Lidar()
   img, depth_map, meta = lidar.read()
+
+  
+  phone_lidar_read_time = time.time()
+
+  print("[TIME] Lidar sending took", phone_lidar_read_time - radar_init_time, "seconds")
+
+
   floor_dist, box_dist, table_dist = detect_planes_and_box(img, depth_map, meta)
   print('Table distance', table_dist)
+
+  lidar_detect_time = time.time()
+
+  print("[TIME] Lidar detecting took", lidar_detect_time - phone_lidar_read_time, "seconds")
+
 
 
   # ==== collect data from radar
@@ -46,6 +63,10 @@ while True:
   avg_chirps = np.mean(frame, axis=0)     # shape: (num_samples, num_rx)
   # choose rx0
   signal = avg_chirps                     # shape: (num_samples, num_rx)
+
+  radar_data_time = time.time()
+
+  print("[TIME] Radar data reading took", radar_data_time - lidar_detect_time, "seconds")
 
 
   # ==== process data from radar with fft
@@ -77,6 +98,11 @@ while True:
   message = "TRUE" if detection else "FALSE"
   print("Detection", detection)
 
+  radar_processing_time = time.time()
+
+  print("[TIME] Radar fft processing took", radar_processing_time - radar_data_time, "seconds")
+
+
   def send_to_phone(message, ip, port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.sendto(message.encode(), (ip, port))
@@ -85,6 +111,14 @@ while True:
   ip = "192.168.41.62"
   port = 9999
   send_to_phone(message, ip, port)
+
+  udp_sendphone_time = time.time()
+
+  print("[TIME] UDP send to phone time took", udp_sendphone_time - radar_processing_time, "seconds")
+
+  print("[TIME] TOTAL TIME:", time.time() - start_time, "seconds")
+
+
 
 
 
