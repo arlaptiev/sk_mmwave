@@ -9,8 +9,8 @@ from datetime import datetime
 import argparse
 import numpy as np
 
-from xwr_raw.dcapub import DCAPub
-from xwr_raw.dsp import reshape_frame
+from src.xwr_raw.dcapub import DCAPub
+from src.xwr_raw.dsp import reshape_frame
 
 
 class Radar:
