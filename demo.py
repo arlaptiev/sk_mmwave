@@ -9,7 +9,7 @@ from scipy.fft import fft, fftfreq
 from scipy.signal import windows
 from scipy.fft import fftshift
 
-from nodes.phone_node import Lidar
+from nodes.lidar import Lidar
 from src.lidar_dsp import detect_planes_and_box
 
 import time
