@@ -8,15 +8,22 @@ import threading
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from nodes.radar import Radar
-from nodes.lidar import listen_to_phone
+from nodes.lidar import Lidar
 
 
-# radar_buf = [{'data': frame_data, 'node': 'radar', 'timestamp': timestamp}]
-radar_buf = [None] * 10000
 
-# is called when the TCP packet from phone arrives
-def check_the_box(phone_lidar_msg, phone_socket):
-    # phone_lidar_msg: {'data': lidar_frame_data, 'node': 'lidar', 'timestamp': timestamp}
+RADAR_BUF_SIZE = 10000
+LIDAR_BUF_SIZE = 100
+
+radar_buf = [None] * RADAR_BUF_SIZE                     # [{'data': frame_data, 'node': 'radar', 'timestamp': timestamp}]    
+lidar_buf = [None] * LIDAR_BUF_SIZE                     # [{'data': lidar_frame_data, 'node': 'lidar', 'timestamp': timestamp}]
+
+
+
+def detect_object(lidar_msg, phone_socket):
+    # lidar_msg: {'data': lidar_frame_data, 'node': 'lidar', 'timestamp': timestamp}
+    # TODO: implement detection + response to phone
+
     # checks radar buffer for the correct frame
         # go through the radar_buf and find the closest record 
     # calls detection function
@@ -24,9 +31,21 @@ def check_the_box(phone_lidar_msg, phone_socket):
     pass
 
 
-def add_to_buf(radar_msg):
+
+
+def handle_lidar_msg(lidar_msg, phone_socket):
+    """Called when a new lidar reading TCP packet is received. Adds a new lidar message to the lidar buffer."""
+    lidar_buf.pop(0)
+    lidar_buf.append(lidar_msg)
+
+    detect_object(lidar_msg, phone_socket)
+
+
+def handle_radar_msg(radar_msg):
+    """Called when a new radar reading is passed over the Ethernet. Adds a new radar message to the radar buffer."""
     radar_buf.pop(0)
     radar_buf.append(radar_msg)
+
 
 
 def main():
@@ -40,16 +59,18 @@ def main():
 
     args = parser.parse_args()
 
-    # make radar thread
+    # Start the radar node
     radar = Radar(args)
     radar_thread = threading.Thread(radar.run_polling(callback=print)) 
 
-    # make phone thread
-    #phone_thread = threading.Thread(listen_to_phone(callback=check_the_box))
+    # Start the lidar node
+    lidar = Lidar()
+    lidar_thread = threading.Thread(lidar.run_polling(callback=print))
 
-    # start all threads
-    # radar_thread.start()
-    #phone_thread.start()
+
+    # Start all threads
+    radar_thread.start()
+    lidar_thread.start()
 
 
 

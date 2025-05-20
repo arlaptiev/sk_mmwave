@@ -1,63 +1,45 @@
 import os
 import sys
 import argparse
-import csv
+import pickle
 from datetime import datetime
-import json
-import numpy as np
 
+import threading
 
 # Add the project root and sibling directories to PYTHONPATH
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from nodes.radar import Radar
+from nodes.lidar import Lidar
 
 
+# Global session timestamp and node directory map
+recording_start_time = datetime.now().strftime("%Y%m%d_%H%M%S")
+base_dir = os.path.join("data", "recordings", recording_start_time)
 
+node_dirs = {}
 
-# Global writer map
-writers = {}
-
-def setup_logging_file(node_name, cols):
-    dir_path = os.path.join("data", node_name)
-    os.makedirs(dir_path, exist_ok=True)
-
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"{node_name}_{timestamp}.csv"
-    file_path = os.path.join(dir_path, filename)
-
-    file = open(file_path, "w", newline="")
-    writer = csv.DictWriter(file, fieldnames=cols)
-    writer.writeheader()
-
-    writers[node_name] = (file, writer)
-    print(f"[INFO] Logging {node_name} data to {file_path}")
-
-
-
-def serialize(value):
-    if isinstance(value, (np.ndarray, list, tuple)):
-        return json.dumps(value.tolist())  # cleaner and CSV-safe
-    elif isinstance(value, dict):
-        return json.dumps(value)
-    else:
-        return value
-
+def setup_logging_dir(node_name):
+    node_path = os.path.join(base_dir, node_name)
+    os.makedirs(node_path, exist_ok=True)
+    node_dirs[node_name] = node_path
+    print(f"[INFO] Logging {node_name} data to {node_path}")
 
 
 def record(message):
     node = message.get("node", "unknown")
-
-    if node not in writers:
-        print(f"[WARN] No file initialized for node '{node}'. Skipping.")
+    if node not in node_dirs:
+        print(f"[WARN] No directory initialized for node '{node}'. Skipping.")
         return
 
-    _, writer = writers[node]
+    # Use full ISO timestamp with underscores instead of colons
+    timestamp = datetime.now().isoformat().replace(":", "-")
+    file_path = os.path.join(node_dirs[node], f"{timestamp}.pkl")
 
-    serialized_message = {k: serialize(v) for k, v in message.items()}
-    writer.writerow(serialized_message)
+    with open(file_path, "wb") as f:
+        pickle.dump(message, f)
 
-
+    print(f"[DEBUG] Saved {node} message to {file_path}")
 
 
 def main():
@@ -67,15 +49,24 @@ def main():
     parser.add_argument("--cfg",            default='configs/1443_mmwavestudio_config_continuous.lua', type=str, help="Path to the Lua config file")
     parser.add_argument('--host_ip',        default='192.168.33.30', help='IP address of host.')
     parser.add_argument('--host_data_port', default=4098, type=int, help='Data port of host.')
+    # phone args
 
     args = parser.parse_args()
 
     # Start the radar node
-    setup_logging_file("radar", ['node', 'data', 'timestamp'])
+    setup_logging_dir("radar")
     radar = Radar(args)
-    radar.run_polling(callback=record)
+    radar_thread = threading.Thread(radar.run_polling(callback=record)) 
+
+    # Start the lidar node
+    setup_logging_dir("lidar")
+    lidar = Lidar()
+    lidar_thread = threading.Thread(lidar.run_polling(callback=record))
 
 
+    # Start all threads
+    radar_thread.start()
+    lidar_thread.start()
 
 
 if __name__ == "__main__":
