@@ -60,7 +60,7 @@ def main():
     args = parser.parse_args()
 
     # Start the radar node
-    radar = Radar(args)
+    radar = Radar(args.cfg, args.host_ip, args.host_data_port)
     radar_thread = threading.Thread(radar.run_polling(callback=print)) 
 
     # Start the phone node

@@ -14,24 +14,21 @@ from src.xwr_raw.dsp import reshape_frame
 
 
 class Radar:
-    def __init__(self, args):
+    def __init__(self, cfg='configs/1443_mmwavestudio_config_continuous.lua', host_ip='192.168.33.30', host_data_port=4098):
         """Initializes radar capture and starts publishing frames.
 
         Args:
-            args: Parsed arguments with:
-                `cfg`           - Path to LUA configuration file for radar
-                `host_ip`       - IP address of host
-                `host_port`     - Data port of host
-            callback (callable, optional): Function to handle published radar data.
-            verbose (bool): If True, prints status messages.
+            cfg (str): Path to the LUA configuration file for radar.
+            host_ip (str): IP address of the host to connect to.
+            host_data_port (int): Data port of the host to connect to.
         """
-        print(f"[INFO] Starting radar node with config: {args.cfg}")
-        print(f"[INFO] Connecting radar with host {args.host_ip}:{args.host_data_port}")
+        print(f"[INFO] Starting radar node with config: {cfg}")
+        print(f"[INFO] Connecting radar with host {host_ip}:{host_data_port}")
 
         self.dcapub = DCAPub(
-            cfg=args.cfg,
-            host_ip=args.host_ip,
-            host_data_port=int(args.host_data_port)
+            cfg=cfg,
+            host_ip=host_ip,
+            host_data_port=int(host_data_port)
         )
 
         self.config = self.dcapub.config
@@ -102,13 +99,13 @@ class Radar:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Run radar data publisher without ROS.")
-    parser.add_argument('--cfg', help="Path to LUA configuration file for radar")
+    parser.add_argument('--cfg',            default='configs/1443_mmwavestudio_config_continuous.lua', help="Path to LUA configuration file for radar")
     parser.add_argument('--host_ip',        default='192.168.33.30', help='IP address of host.')
     parser.add_argument('--host_data_port', default=4098, type=int, help='Data port of host.')
     args = parser.parse_args()
 
     # Use a simple print function as default publisher for CLI runs
-    radar = Radar(args)
+    radar = Radar(args.cfg, args.host_ip, args.host_data_port)
 
     try:
         radar.run_polling(callback=print)

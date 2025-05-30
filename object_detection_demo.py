@@ -1,5 +1,4 @@
 import socket
-from types import SimpleNamespace
 from nodes.radar import Radar
 
 import numpy as np
@@ -20,12 +19,7 @@ while True:
   start_time = time.time()
 
   # ==== initialize radar and set params
-  args = SimpleNamespace(**{
-    'cfg': 'configs/1443_mmwavestudio_config_continuous.lua',
-    'host_ip': '192.168.33.30',
-    'host_data_port': 4098,
-  })
-  radar = Radar(args)
+  radar = Radar()
 
   c = 3e8                                                 # speed of light - m/s
   SAMPLES_PER_CHIRP = radar.params['n_samples']           # adc number of samples per chirp

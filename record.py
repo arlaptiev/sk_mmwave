@@ -55,7 +55,7 @@ def main():
 
     # Start the radar node
     setup_logging_dir("radar")
-    radar = Radar(args)
+    radar = Radar(args.cfg, args.host_ip, args.host_data_port)
     radar_thread = threading.Thread(radar.run_polling(callback=record)) 
 
     # Start the phone node
