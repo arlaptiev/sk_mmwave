@@ -46,7 +46,8 @@ kill [task_number]
 ## PHONE NODE
 
 ### How to run:
-1. Get the edge server wireless ip address:
+1. Connect edge server and phone where app is running to the same wifi connection
+2. Get the edge server wireless ip address:
 ```bash
 ipconfig
 ```
@@ -55,12 +56,12 @@ On mac:
 ipconfig getifaddr en0
 ```
 
-2. Disable the firewall on the edge server:
+3. Disable the firewall on the edge server:
 On mac: network -> firewall -> turn off firewall
 
-3. Set the host ip address in the phone app settings
+4. Set the host ip address in the phone app viewController file
 
-4. Run the phone node:
+5. Run the phone node:
 ```bash
 python -m nodes.phone
 ```
