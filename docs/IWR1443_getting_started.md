@@ -79,7 +79,7 @@ Video tutorial: [https://www.ti.com/video/5827389052001](https://www.ti.com/vide
 7. Load LUA script:  
    1. In the bottom bar, Browse and Play a demo script:  
       1. mmwave\_studio\_\<ver\>\\mmWaveStudio\\Scripts\\DataCaptureDemo\_xWR.lua  
-      2. This script is fake, always outputs a clean peak  
+      2. This script has a fake source of data, always outputs a clean peak  
       3. If MSS Patch firmware version is 0.0.0.0, it means the chip is flashed with wrong/corrupt firmware. Fix: Set the jumpers on SOP0 and SOP2. Reset power on DCA1000EVM. Open UnitFlash, start new configuration with device. Then, go to Settings & Utilities. Set COM Port to User UART (CFG) port. Hit “Format SFLASH”. After formatting, put the jumpers back to SOP0 and SOP1 and reset power.  
    2. Post-processed results are saved here:  
       1. \\mmwave\_studio\_\<ver\>\\mmWaveStudio\\PostProc  
