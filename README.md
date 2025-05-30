@@ -1,5 +1,7 @@
 # Signal Kinetics mmWave Kit
 
+This repository contains the code for interfacing the TI's IWR1443 mmWave radar sensor in real-time, connected via Ethernet, as well as the iPhone sensor data, connected wirelessly.
+
 ## RADAR NODE:
 
 ### How to run:
