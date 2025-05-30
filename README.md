@@ -29,13 +29,13 @@ python -m nodes.radar --cfg='configs/1443_mmwavestudio_config_continuous.lua'
 see [notebooks/radar.ipynb](notebooks/radar.ipynb)
 
 ### Common errors:
-If radar data socket is already in use, kill the process that is using it:
+- If radar data socket is already in use, kill the process that is using it:
 ```bash
 netstat -aon | findstr :4098
 kill [task_number]
 ```
 
-If the data stops flowing, and the IWR1443 stops flashing green, it is most likely that the data socket buffer is full. You have to rerun the lua script in mmWave Studio to reset the data stream. You can avoid this by setting the radar parameters such that less data is sent (or less frequently), you can also set `radar.run_polling(lose_frames=True)` if you don't care about collecting consecutive frames (again, this will drop some data!). To flush the data socket buffer, run `radar.flush()`.
+- If the data stops flowing, and the IWR1443 stops flashing green, it is most likely that the data socket buffer is full. You have to rerun the lua script in mmWave Studio to reset the data stream. You can avoid this by setting the radar parameters such that less data is sent (or less frequently), you can also set `radar.run_polling(lose_frames=True)` if you don't care about collecting consecutive frames (again, this will drop some data!). To flush the data socket buffer, run `radar.flush()`.
 
 ### Notes:
 - The messages from the radar node include timestamps but they are python-level timestamps, not the hardware-level timestamps of when the edge server received the data on the Ethernet cable. It is possible to get the hardware-level timestamps if implemented on a linux machine.
