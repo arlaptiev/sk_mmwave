@@ -14,7 +14,7 @@ This repository contains the code for interfacing the TI's IWR1443 mmWave radar 
 
 ## RADAR NODE
 
-Initiates the node with the parameters inferred from the mmWave Studio lua file. Reads the raw IQ data stream from the data Ethernet socket continuously with `radar.run_polling([callback function])` or in a single read with `radar.read()`. For getting started with the IWR1443 radar and mmWave Studio, refer to docs/IWR1443_getting_started.md. Reference for the lua api: docs/Lua_API.md.
+Initiates the node with the parameters inferred from the mmWave Studio lua file. Reads the raw IQ data stream from the data Ethernet socket continuously with `radar.run_polling([callback function])` or in a single read with `radar.read()`. For getting started with the IWR1443 radar and mmWave Studio, refer to [docs/IWR1443_getting_started.md](docs/IWR1443_getting_started.md). Reference for the lua api: [docs/Lua_API.md](docs/Lua_API.md).
 
 ### How to run:
 1. Open mmWaveStudio and run the configs/1443_mmwavestudio_config_continuous.lua file (IWR1443 should start flashing green)
@@ -25,8 +25,8 @@ python -m nodes.radar --cfg='configs/1443_mmwavestudio_config_continuous.lua'
 ```
 
 
-### Usage example: 
-see notebooks/radar.ipynb
+### Usage & outputs example: 
+see [notebooks/radar.ipynb](notebooks/radar.ipynb)
 
 ### Common errors:
 If radar data socket is already in use, kill the process that is using it:
@@ -39,7 +39,7 @@ If the data stops flowing, and the IWR1443 stops flashing green, it is most like
 
 ### Notes:
 - The messages from the radar node include timestamps but they are python-level timestamps, not the hardware-level timestamps of when the edge server received the data on the Ethernet cable. It is possible to get the hardware-level timestamps if implemented on a linux machine.
-- You can find the useful example of reading the mmWave Studio .bin recorded data file in notebooks/radar_bin_read.ipynb
+- You can find the useful example of reading the mmWave Studio .bin recorded data file in [notebooks/radar_bin_read.ipynb](notebooks/radar_bin_read.ipynb). This is useful for debugging and testing the radar node against the data recorded in mmWave Studio.
 
 
 
@@ -66,5 +66,5 @@ python -m nodes.phone
 ```
 
 
-### Usage example: 
-notebooks/phone.ipynb
+### Usage & outputs example: 
+see [notebooks/phone.ipynb](notebooks/phone.ipynb)
