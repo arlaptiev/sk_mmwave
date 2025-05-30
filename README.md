@@ -1,12 +1,16 @@
 # Signal Kinetics mmWave Kit
 
-This repository contains the code for interfacing the TI's IWR1443 mmWave radar sensor in real-time, connected via Ethernet, as well as the iPhone sensor data, connected wirelessly.
+This repository contains the code for interfacing the TI's IWR1443 mmWave radar sensor in real-time, connected via Ethernet, as well as the iPhone sensor data (camera + lidar + position), connected wirelessly.
 
-### useful utilities:
+### Useful utilities:
 - `python -m main` - starts the radar and phone nodes in continuous mode, prints the data to the console
 - `python -m record` - starts the radar and phone nodes in continuous mode, saves the data to a data/recordings/[recording start time]/[node name]/[timestamp].pkl file
 - `python -m live_fft` - plots the live FFT of the radar data, using matplotlib
 - `python -m live_fft_cv` - plots the live FFT of the radar data, using OpenCV
+
+### Object Detection Demo:
+
+- `python -m object_detection_demo` - demo script running the radar node and the phone node, detecting presence of an object inside a box on the table.
 
 ## RADAR NODE
 
@@ -21,17 +25,17 @@ python -m nodes.radar --cfg='configs/1443_mmwavestudio_config_continuous.lua'
 ```
 
 
-### usage example: 
+### Usage example: 
 see notebooks/radar.ipynb
 
-### common errors:
+### Common errors:
 If radar data socket is already in use:
 ```bash
 netstat -aon | findstr :4098
 kill [task_number]
 ```
 
-### notes:
+### Notes:
 - The messages from the radar node include timestamps but they are python-level timestamps, not the hardware-level timestamps of when the edge server received the data on the Ethernet cable. It is possible to get the hardware-level timestamps if implemented on a linux machine. 
 - You can flush the radar data buffer by running: `radar.flush()`
 - You can find the example of reading the mmWave Studio .bin recorded data file in notebooks/radar_bin_read.ipynb
@@ -61,5 +65,5 @@ python -m nodes.phone
 ```
 
 
-### usage example: 
+### Usage example: 
 notebooks/phone.ipynb
