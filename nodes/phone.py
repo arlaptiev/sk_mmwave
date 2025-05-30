@@ -12,9 +12,9 @@ import numpy as np
 import cv2
 
 
-class Lidar:
+class Phone:
     def __init__(self, host='0.0.0.0', port=5005):
-        """Initializes the TCP server to listen for incoming lidar data."""
+        """Initializes the TCP server to listen for incoming phone data."""
         self.host = host
         self.port = port
         self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -61,11 +61,10 @@ class Lidar:
                 img_array = np.frombuffer(img_bytes, dtype=np.uint8)
                 cv2_image = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
 
-                # radar_msg = {'data': frame_data, 'node': 'radar', 'timestamp': timestamp, 'params': self.params}
-                lidar_msg = {'data': {'img': cv2_image, 'depth_map': depth_map, 'meta': meta}, 'node': 'lidar', 'timestamp': now}
+                phone_msg = {'data': {'img': cv2_image, 'depth_map': depth_map, 'meta': meta}, 'node': 'phone', 'timestamp': now}
 
                 if callback:
-                    callback(lidar_msg)
+                    callback(phone_msg)
 
             except Exception as e:
                 self.server_sock.close()
@@ -133,10 +132,10 @@ if __name__ == '__main__':
     parser.add_argument('--port', default=5005, type=int, help="TCP port to listen on.")
     args = parser.parse_args()
 
-    server = Lidar(host=args.host, port=args.port)
+    phone = Phone(host=args.host, port=args.port)
     try:
-        server.listen()
+        phone.run_polling(callback=print)
     except KeyboardInterrupt:
         print("[INFO] Shutting down server.")
     finally:
-        server.close()
+        phone.close()

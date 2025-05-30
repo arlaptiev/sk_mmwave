@@ -8,20 +8,20 @@ import threading
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from nodes.radar import Radar
-from nodes.lidar import Lidar
+from nodes.phone import Phone
 
 
 
 RADAR_BUF_SIZE = 10000
-LIDAR_BUF_SIZE = 100
+PHONE_BUF_SIZE = 100
 
 radar_buf = [None] * RADAR_BUF_SIZE                     # [{'data': frame_data, 'node': 'radar', 'timestamp': timestamp}]    
-lidar_buf = [None] * LIDAR_BUF_SIZE                     # [{'data': lidar_frame_data, 'node': 'lidar', 'timestamp': timestamp}]
+phone_buf = [None] * PHONE_BUF_SIZE                     # [{'data': lidar_frame_data, 'node': 'phone', 'timestamp': timestamp}]
 
 
 
-def detect_object(lidar_msg, phone_socket):
-    # lidar_msg: {'data': lidar_frame_data, 'node': 'lidar', 'timestamp': timestamp}
+def detect_object(phone_msg, phone_socket):
+    # phone_msg: {'data': lidar_frame_data, 'node': 'phone', 'timestamp': timestamp}
     # TODO: implement detection + response to phone
 
     # checks radar buffer for the correct frame
@@ -33,12 +33,12 @@ def detect_object(lidar_msg, phone_socket):
 
 
 
-def handle_lidar_msg(lidar_msg, phone_socket):
-    """Called when a new lidar reading TCP packet is received. Adds a new lidar message to the lidar buffer."""
-    lidar_buf.pop(0)
-    lidar_buf.append(lidar_msg)
+def handle_phone_msg(phone_msg, phone_socket):
+    """Called when a new phone reading TCP packet is received. Adds a new phone message to the phone buffer."""
+    phone_buf.pop(0)
+    phone_buf.append(phone_msg)
 
-    detect_object(lidar_msg, phone_socket)
+    detect_object(phone_msg, phone_socket)
 
 
 def handle_radar_msg(radar_msg):
@@ -63,14 +63,14 @@ def main():
     radar = Radar(args)
     radar_thread = threading.Thread(radar.run_polling(callback=print)) 
 
-    # Start the lidar node
-    lidar = Lidar()
-    lidar_thread = threading.Thread(lidar.run_polling(callback=print))
+    # Start the phone node
+    phone = Phone()
+    phone_thread = threading.Thread(phone.run_polling(callback=print))
 
 
     # Start all threads
     radar_thread.start()
-    lidar_thread.start()
+    phone_thread.start()
 
 
 

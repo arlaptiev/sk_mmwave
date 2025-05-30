@@ -108,6 +108,14 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Use a simple print function as default publisher for CLI runs
-    radar = Radar(args, callback=print)
+    radar = Radar(args)
+
+    try:
+        radar.run_polling(callback=print)
+    except KeyboardInterrupt:
+        print("[INFO] Shutting down radar node.")
+    finally:
+        radar.close()
+
 
 

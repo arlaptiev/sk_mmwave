@@ -10,7 +10,7 @@ import threading
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from nodes.radar import Radar
-from nodes.lidar import Lidar
+from nodes.phone import Phone
 
 
 # Global session timestamp and node directory map
@@ -58,15 +58,15 @@ def main():
     radar = Radar(args)
     radar_thread = threading.Thread(radar.run_polling(callback=record)) 
 
-    # Start the lidar node
-    setup_logging_dir("lidar")
-    lidar = Lidar()
-    lidar_thread = threading.Thread(lidar.run_polling(callback=record))
+    # Start the phone node
+    setup_logging_dir("phone")
+    phone = Phone()
+    phone_thread = threading.Thread(phone.run_polling(callback=record))
 
 
     # Start all threads
     radar_thread.start()
-    lidar_thread.start()
+    phone_thread.start()
 
 
 if __name__ == "__main__":
