@@ -36,8 +36,13 @@ kill [task_number]
 
 ### How to run:
 1. Get the edge server wireless ip address:
+```bash
 ipconfig
-On mac: ipconfig getifaddr en0
+```
+On mac: 
+```bash
+ipconfig getifaddr en0
+```
 
 2. Disable the firewall on the edge server:
 On mac: network -> firewall -> turn off firewall
