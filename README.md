@@ -2,7 +2,9 @@
 
 This repository contains the code for interfacing the TI's IWR1443 mmWave radar sensor in real-time, connected via Ethernet, as well as the iPhone sensor data, connected wirelessly.
 
-## RADAR NODE:
+## RADAR NODE
+
+Initiates the node with the parameters inferred from the mmWave Studio lua file. Reads the raw IQ data stream from the data Ethernet socket continuously with `radar.run_polling([callback function])` or in a single read with `radar.read()`. For getting started with the IWR1443 radar and mmWave Studio, refer to docs/IWR1443_getting_started.md. Reference for the lua api: docs/Lua_API.md.
 
 ### How to run:
 1. Open mmWaveStudio and run the configs/1443_mmwavestudio_config_continuous.lua file
@@ -30,7 +32,7 @@ kill [task_number]
 
 
 
-## PHONE NODE:
+## PHONE NODE
 
 ### How to run:
 1. Get the edge server wireless ip address:
