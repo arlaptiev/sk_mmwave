@@ -9,7 +9,7 @@ from scipy.fft import fft, fftfreq
 from scipy.signal import windows
 from scipy.fft import fftshift
 
-from nodes.phone import Lidar
+from nodes.phone import Phone
 from src.lidar_dsp import detect_planes_and_box
 
 import time
@@ -38,21 +38,21 @@ while True:
   print("[TIME] Radar took", radar_init_time - start_time, "seconds to init")
 
   # ==== initialize phone socket
-  lidar = Lidar()
-  img, depth_map, meta = lidar.read()
+  phone = Phone()
+  img, depth_map, meta = phone.read()
 
   
-  phone_lidar_read_time = time.time()
+  phone_read_time = time.time()
 
-  print("[TIME] Lidar sending took", phone_lidar_read_time - radar_init_time, "seconds")
+  print("[TIME] Phone sending took", phone_read_time - radar_init_time, "seconds")
 
 
   floor_dist, box_dist, table_dist = detect_planes_and_box(img, depth_map, meta)
   print('Table distance', table_dist)
 
-  lidar_detect_time = time.time()
+  phone_detect_time = time.time()
 
-  print("[TIME] Lidar detecting took", lidar_detect_time - phone_lidar_read_time, "seconds")
+  print("[TIME] Lidar detecting took", phone_detect_time - phone_read_time, "seconds")
 
 
 
@@ -66,7 +66,7 @@ while True:
 
   radar_data_time = time.time()
 
-  print("[TIME] Radar data reading took", radar_data_time - lidar_detect_time, "seconds")
+  print("[TIME] Radar data reading took", radar_data_time - phone_detect_time, "seconds")
 
 
   # ==== process data from radar with fft
