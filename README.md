@@ -2,6 +2,12 @@
 
 This repository contains the code for interfacing the TI's IWR1443 mmWave radar sensor in real-time, connected via Ethernet, as well as the iPhone sensor data, connected wirelessly.
 
+### useful utilities:
+- `python -m main` - starts the radar and phone nodes in continuous mode, prints the data to the console
+- `python -m record` - starts the radar and phone nodes in continuous mode, saves the data to a data/recordings/[recording start time]/[node name]/[timestamp].pkl file
+- `python -m live_fft` - plots the live FFT of the radar data, using matplotlib
+- `python -m live_fft_cv` - plots the live FFT of the radar data, using OpenCV
+
 ## RADAR NODE
 
 Initiates the node with the parameters inferred from the mmWave Studio lua file. Reads the raw IQ data stream from the data Ethernet socket continuously with `radar.run_polling([callback function])` or in a single read with `radar.read()`. For getting started with the IWR1443 radar and mmWave Studio, refer to docs/IWR1443_getting_started.md. Reference for the lua api: docs/Lua_API.md.
