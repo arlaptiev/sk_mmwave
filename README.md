@@ -18,8 +18,9 @@ Initiates the node with the parameters inferred from the mmWave Studio lua file.
 
 ### How to run:
 1. Open mmWaveStudio and run the configs/1443_mmwavestudio_config_continuous.lua file (IWR1443 should start flashing green)
-
-2. Start the radar node:
+2. Change the phone IP adress in object_detection_demo
+3. Connect edge server and phone to the same wifi
+4. Start the radar node:
 ```
 python -m nodes.radar --cfg='configs/1443_mmwavestudio_config_continuous.lua'
 ```
