@@ -1,73 +1,141 @@
-import socket
+#!/usr/bin/env python3
+
+"""TCP server to receive JSON payloads from phone and save image, depth, and metadata."""
+
+import os
 import json
 import base64
-import os
+import socket
+import argparse
 from datetime import datetime
+import numpy as np
+import cv2
 
 
-def listen_to_phone():
-    HOST = '0.0.0.0'
-    PORT = 5005
+class Phone:
+    def __init__(self, host='0.0.0.0', port=5005):
+        """Initializes the TCP server to listen for incoming phone data."""
+        self.host = host
+        self.port = port
+        self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.prev_addr = ""
 
-    # Ensure captures directory exists
-    os.makedirs('captures', exist_ok=True)
-
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_sock:
-        server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        server_sock.bind((HOST, PORT))
-        server_sock.listen()
-        print(f'Listening on TCP {HOST}:{PORT}…')
+    def run_polling(self, callback=None):
+        """Begins listening for incoming connections and handles them."""
+        self.server_sock.bind((self.host, self.port))
+        self.server_sock.listen()
+        print(f"[INFO] Listening on TCP {self.host}:{self.port}...")
 
         while True:
-            conn, addr = server_sock.accept()
-            print(f'Connected by {addr}')
+            conn, addr = self.server_sock.accept()
+            self.prev_addr = addr
+            print(f"[INFO] Connected by {addr}")
             try:
-                # Read one full JSON line (blocking) from the client
                 with conn.makefile('rb') as f:
-                    print(f"[Server] Waiting to receive data from {addr}")
+                    print(f"[INFO] Waiting to receive data from {addr}")
                     line = f.readline()
 
                 if not line:
-                    print("⚠️  No data received from", addr)
+                    print(f"[WARN] No data received from {addr}")
                     continue
 
-                # Parse JSON
                 try:
                     frame = json.loads(line.decode('utf-8'))
                 except json.JSONDecodeError as e:
-                    print("❌ Invalid JSON:", e)
+                    print(f"[ERROR] Invalid JSON: {e}")
                     continue
 
-                # Use server's current date/time for human-readable folder - might need to change it later to align with timestamps from radar
                 now = datetime.now()
-                readable_ts = now.strftime("%Y-%m-%d_%H-%M-%S.%f")[:-3]
 
-                # Create output directory
-                out_dir = os.path.join('captures', readable_ts)
-                os.makedirs(out_dir, exist_ok=True)
-
-                # Decode and save payloads
-                img_bytes   = base64.b64decode(frame['image'])
+                img_bytes = base64.b64decode(frame['image'])
                 depth_bytes = base64.b64decode(frame['depth'])
-                meta        = frame.get('meta', {})
+                meta = frame.get('meta', {})
 
-                with open(os.path.join(out_dir, 'frame.jpg'), 'wb') as img_f:
-                    img_f.write(img_bytes)
-                with open(os.path.join(out_dir, 'depth.bin'), 'wb') as depth_f:
-                    depth_f.write(depth_bytes)
-                with open(os.path.join(out_dir, 'meta.json'), 'w') as meta_f:
-                    json.dump(meta, meta_f, indent=2)
+                # bytes to depth map
+                W, H = 256, 192
+                depth_array = np.frombuffer(depth_bytes, dtype=np.float32)
+                depth_map = depth_array.reshape((H, W))
 
-                print(f'✅ Saved capture {readable_ts} → {out_dir}')
+                # bytes to img
+                img_array = np.frombuffer(img_bytes, dtype=np.uint8)
+                cv2_image = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+
+                phone_msg = {'data': {'img': cv2_image, 'depth_map': depth_map, 'meta': meta}, 'node': 'phone', 'timestamp': now}
+
+                if callback:
+                    callback(phone_msg)
 
             except Exception as e:
-                print("Error handling connection:", e)
+                self.server_sock.close()
+                print(f"[ERROR] Error handling connection: {e}")
             finally:
                 conn.close()
 
-    @staticmethod
-    
+    def read(self):
+        """Reads a single JSON-encoded frame from the next incoming connection.
+
+        Returns:
+            tuple: (img, depth_map, meta) if successful, else None
+        """
+        self.server_sock.bind((self.host, self.port))
+        self.server_sock.listen()
+        print(f"[INFO] Waiting for a single connection on {self.host}:{self.port}...")
+
+        conn, addr = self.server_sock.accept()
+        self.prev_addr = addr
+        print(f"[INFO] Connected by {addr}")
+        try:
+            with conn.makefile('rb') as f:
+                line = f.readline()
+
+            if not line:
+                print(f"[WARN] No data received from {addr}")
+                return None
+
+            try:
+                frame = json.loads(line.decode('utf-8'))
+            except json.JSONDecodeError as e:
+                print(f"[ERROR] Invalid JSON: {e}")
+                return None
+
+            img_bytes = base64.b64decode(frame['image'])
+            depth_bytes = base64.b64decode(frame['depth'])
+            meta = frame.get('meta', {})
+
+            # bytes to depth map
+            W, H = 256, 192
+            depth_array = np.frombuffer(depth_bytes, dtype=np.float32)
+            depth_map = depth_array.reshape((H, W))
+
+            # bytes to img
+            img_array = np.frombuffer(img_bytes, dtype=np.uint8)
+            cv2_image = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+
+            return cv2_image, depth_map, meta
+
+        except Exception as e:
+            print(f"[ERROR] Error during read: {e}")
+            return None
+        finally:
+            conn.close()
+            self.close()
+  
+
+    def close(self):
+        self.server_sock.close()
 
 
 if __name__ == '__main__':
-    listen_to_phone()
+    parser = argparse.ArgumentParser(description="TCP server to receive and store phone image/depth frames.")
+    parser.add_argument('--host', default='0.0.0.0', help="Host IP to bind to.")
+    parser.add_argument('--port', default=5005, type=int, help="TCP port to listen on.")
+    args = parser.parse_args()
+
+    phone = Phone(host=args.host, port=args.port)
+    try:
+        phone.run_polling(callback=print)
+    except KeyboardInterrupt:
+        print("[INFO] Shutting down server.")
+    finally:
+        phone.close()

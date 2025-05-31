@@ -91,7 +91,7 @@ def main():
     args = parser.parse_args()
 
     # Start the radar node
-    radar = Radar(args)
+    radar = Radar(args.cfg, args.host_ip, args.host_data_port)
     radar.run_polling(callback=display_frame, lose_frames=True)
 
 

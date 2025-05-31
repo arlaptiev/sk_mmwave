@@ -8,15 +8,22 @@ import threading
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from nodes.radar import Radar
-from nodes.phone_node import listen_to_phone
+from nodes.phone import Phone
 
 
-# radar_buf = [{'data': frame_data, 'node': 'radar', 'timestamp': timestamp}]
-radar_buf = [None] * 10000
 
-# is called when the TCP packet from phone arrives
-def check_the_box(phone_lidar_msg, phone_socket):
-    # phone_lidar_msg: {'data': lidar_frame_data, 'node': 'lidar', 'timestamp': timestamp}
+RADAR_BUF_SIZE = 10000
+PHONE_BUF_SIZE = 100
+
+radar_buf = [None] * RADAR_BUF_SIZE                     # [{'data': frame_data, 'node': 'radar', 'timestamp': timestamp}]    
+phone_buf = [None] * PHONE_BUF_SIZE                     # [{'data': lidar_frame_data, 'node': 'phone', 'timestamp': timestamp}]
+
+
+
+def detect_object(phone_msg, phone_socket):
+    # phone_msg: {'data': lidar_frame_data, 'node': 'phone', 'timestamp': timestamp}
+    # TODO: implement detection + response to phone
+
     # checks radar buffer for the correct frame
         # go through the radar_buf and find the closest record 
     # calls detection function
@@ -24,9 +31,21 @@ def check_the_box(phone_lidar_msg, phone_socket):
     pass
 
 
-def add_to_buf(radar_msg):
+
+
+def handle_phone_msg(phone_msg, phone_socket):
+    """Called when a new phone reading TCP packet is received. Adds a new phone message to the phone buffer."""
+    phone_buf.pop(0)
+    phone_buf.append(phone_msg)
+
+    detect_object(phone_msg, phone_socket)
+
+
+def handle_radar_msg(radar_msg):
+    """Called when a new radar reading is passed over the Ethernet. Adds a new radar message to the radar buffer."""
     radar_buf.pop(0)
     radar_buf.append(radar_msg)
+
 
 
 def main():
@@ -40,16 +59,18 @@ def main():
 
     args = parser.parse_args()
 
-    # make radar thread
-    radar = Radar(args)
+    # Start the radar node
+    radar = Radar(args.cfg, args.host_ip, args.host_data_port)
     radar_thread = threading.Thread(radar.run_polling(callback=print)) 
 
-    # make phone thread
-    #phone_thread = threading.Thread(listen_to_phone(callback=check_the_box))
+    # Start the phone node
+    phone = Phone()
+    phone_thread = threading.Thread(phone.run_polling(callback=print))
 
-    # start all threads
-    # radar_thread.start()
-    #phone_thread.start()
+
+    # Start all threads
+    radar_thread.start()
+    phone_thread.start()
 
 
 
